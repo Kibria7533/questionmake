@@ -1,0 +1,89 @@
+"use client";
+import { FaTachometerAlt, FaUsers, FaCog, FaChartBar, FaUserShield, FaBook } from "react-icons/fa";
+import Link from "next/link";
+
+const Sidebar = () => {
+  const styles = {
+    sidebar: {
+      width: "250px",
+      backgroundColor: "#004080",
+      color: "white",
+      display: "flex",
+      flexDirection: "column",
+      padding: "20px",
+      boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+    },
+    sidebarLogo: {
+      fontSize: "1.5rem",
+      fontWeight: "bold",
+      color: "white",
+      marginBottom: "20px",
+      textAlign: "center",
+      cursor: "pointer",
+    },
+    sidebarItem: {
+      marginBottom: "15px",
+      padding: "10px",
+      borderRadius: "5px",
+      cursor: "pointer",
+      textAlign: "center",
+      transition: "background-color 0.3s, box-shadow 0.3s",
+      display: "flex",
+      alignItems: "center",
+      gap: "10px",
+      border: "1px solid #0056b3",
+    },
+    sidebarItemHover: {
+      backgroundColor: "#0056b3",
+    },
+    icon: {
+      fontSize: "1.2rem",
+    },
+  };
+
+  return (
+    <div style={styles.sidebar}>
+      <Link href="/" style={{ textDecoration: "none", color: "inherit" }}>
+        <div style={styles.sidebarLogo}>Question Hat</div>
+      </Link>
+      <Link href="/dashboard" style={{ textDecoration: "none", color: "inherit" }}>
+        <div style={styles.sidebarItem}>
+          <FaTachometerAlt style={styles.icon} />
+          Dashboard
+        </div>
+      </Link>
+      <Link href="/users" style={{ textDecoration: "none", color: "inherit" }}>
+        <div style={styles.sidebarItem}>
+          <FaUsers style={styles.icon} />
+          Users
+        </div>
+      </Link>
+      <Link href="/operators" style={{ textDecoration: "none", color: "inherit" }}>
+        <div style={styles.sidebarItem}>
+          <FaUserShield style={styles.icon} />
+          Operators
+        </div>
+      </Link>
+      <Link href="/questionbank" style={{ textDecoration: "none", color: "inherit" }}>
+        <div style={styles.sidebarItem}>
+          <FaBook style={styles.icon} />
+          Questionbank
+        </div>
+      </Link>
+      <Link href="/settings" style={{ textDecoration: "none", color: "inherit" }}>
+        <div style={styles.sidebarItem}>
+          <FaCog style={styles.icon} />
+          Settings
+        </div>
+      </Link>
+      <Link href="/reports" style={{ textDecoration: "none", color: "inherit" }}>
+        <div style={styles.sidebarItem}>
+          <FaChartBar style={styles.icon} />
+          Reports
+        </div>
+      </Link>
+    </div>
+  );
+};
+
+export default Sidebar;
