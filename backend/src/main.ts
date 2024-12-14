@@ -28,6 +28,6 @@ async function bootstrap() {
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 4000);
 }
-bootstrap().then(() => console.log("Server running on port: 3000"));
+bootstrap().then(() => console.log("Server running on port: 4000"));
