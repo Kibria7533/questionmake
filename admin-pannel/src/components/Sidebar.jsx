@@ -1,8 +1,24 @@
 "use client";
-import { FaTachometerAlt, FaUsers, FaCog, FaChartBar, FaUserShield, FaBook } from "react-icons/fa";
+import { useState } from "react";
+import {
+  FaTachometerAlt,
+  FaUsers,
+  FaCog,
+  FaChartBar,
+  FaUserShield,
+  FaBook,
+  FaPlus,
+  FaSearch,
+} from "react-icons/fa";
 import Link from "next/link";
 
 const Sidebar = () => {
+  const [isQuestionbankOpen, setIsQuestionbankOpen] = useState(false);
+
+  const toggleQuestionbank = () => {
+    setIsQuestionbankOpen(!isQuestionbankOpen);
+  };
+
   const styles = {
     sidebar: {
       width: "250px",
@@ -39,6 +55,28 @@ const Sidebar = () => {
     icon: {
       fontSize: "1.2rem",
     },
+    dropdown: {
+      marginLeft: "20px",
+      marginTop: "10px",
+      display: "flex",
+      flexDirection: "column",
+      gap: "10px", // Add spacing between dropdown items
+    },
+    dropdownItem: {
+      padding: "10px",
+      borderRadius: "5px",
+      cursor: "pointer",
+      transition: "background-color 0.3s",
+      display: "flex",
+      alignItems: "center",
+      gap: "10px",
+      backgroundColor: "#0056b3",
+      color: "white",
+      border: "1px solid #004080",
+    },
+    dropdownItemHover: {
+      backgroundColor: "#003d73",
+    },
   };
 
   return (
@@ -64,12 +102,27 @@ const Sidebar = () => {
           Operators
         </div>
       </Link>
-      <Link href="/questionbank" style={{ textDecoration: "none", color: "inherit" }}>
-        <div style={styles.sidebarItem}>
-          <FaBook style={styles.icon} />
-          Questionbank
+      {/* Questionbank Menu */}
+      <div onClick={toggleQuestionbank} style={{ ...styles.sidebarItem, cursor: "pointer" }}>
+        <FaBook style={styles.icon} />
+        Questionbank
+      </div>
+      {isQuestionbankOpen && (
+        <div style={styles.dropdown}>
+          <Link href="/questionbank-add" style={{ textDecoration: "none", color: "inherit" }}>
+            <div style={styles.dropdownItem}>
+              <FaPlus style={styles.icon} />
+              Add Question
+            </div>
+          </Link>
+          <Link href="/questionbank-explore" style={{ textDecoration: "none", color: "inherit" }}>
+            <div style={styles.dropdownItem}>
+              <FaSearch style={styles.icon} />
+              Explore Questions
+            </div>
+          </Link>
         </div>
-      </Link>
+      )}
       <Link href="/settings" style={{ textDecoration: "none", color: "inherit" }}>
         <div style={styles.sidebarItem}>
           <FaCog style={styles.icon} />
