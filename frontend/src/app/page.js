@@ -1,218 +1,132 @@
 "use client";
 
-import React, { useState } from "react";
-import Multiselect from "multiselect-react-dropdown";
+import React from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import CertificationProviders from "@/components/certificationproviders";
+import Testimonials from "@/components/testimonials";
+import CounterSection from "@/components/countersection";
 
 const Home = () => {
   const styles = {
     container: {
-      fontFamily: "Arial, sans-serif",
-      padding: "20px",
-    },
-    header: {
-      textAlign: "center",
-      marginBottom: "30px",
-    },
-    title: {
-      fontSize: "2.5rem",
-      color: "#004080",
-      marginBottom: "10px",
-    },
-    subtitle: {
-      fontSize: "1.2rem",
-      color: "#333",
-      marginBottom: "5px",
-    },
-    formSection: {
-      display: "flex",
-      flexDirection: "column",
-      gap: "15px",
-      maxWidth: "500px",
-      margin: "0 auto",
-    },
-    input: {
-      padding: "10px",
-      fontSize: "1rem",
-      border: "1px solid #ccc",
-      borderRadius: "5px",
-      width: "100%",
-      height: "45px",
-    },
-    dropdown: {
-      border: "1px solid #ccc",
-      borderRadius: "5px",
-      width: "100%",
-      height: "45px",
-    },
-    button: {
-      backgroundColor: "#004080",
+      backgroundColor: "#1e1e1e",
       color: "#fff",
-      padding: "10px 20px",
-      fontSize: "1rem",
-      border: "none",
-      borderRadius: "5px",
-      cursor: "pointer",
-      transition: "background-color 0.3s",
+      padding: "50px 20px",
+      textAlign: "center",
+      fontFamily: "'Arial', sans-serif",
     },
-    card: {
-      border: "1px solid #ccc",
-      borderRadius: "5px",
-      padding: "10px",
-      margin: "10px 0",
-      backgroundColor: "#f9f9f9",
-    },
-    totalSection: {
-      marginTop: "20px",
+    heading: {
+      fontSize: "2.5rem",
       fontWeight: "bold",
     },
-    generateButton: {
-      backgroundColor: "#004080",
+    subheading: {
+      fontSize: "1rem",
+      color: "#bbb",
+    },
+    stats: {
+      display: "flex",
+      justifyContent: "center",
+      gap: "50px",
+      marginTop: "20px",
+    },
+    statItem: {
+      textAlign: "center",
+    },
+    statValue: {
+      fontSize: "2rem",
+      fontWeight: "bold",
+      color: "#00a8ff",
+    },
+    formContainer: {
+      marginTop: "30px",
+      backgroundColor: "#333",
+      padding: "20px",
+      borderRadius: "5px",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    inputGroup: {
+      display: "flex",
+      width: "100%",
+      maxWidth: "700px",
+    },
+    dropdown: {
+      flex: "1",
+      border: "none",
+      padding: "10px",
+      fontSize: "1rem",
+    },
+    input: {
+      flex: "2",
+      border: "none",
+      padding: "10px",
+      fontSize: "1rem",
+    },
+    button: {
+      backgroundColor: "#00a8ff",
       color: "#fff",
+      border: "none",
       padding: "10px 20px",
       fontSize: "1rem",
-      border: "none",
-      borderRadius: "5px",
       cursor: "pointer",
-      marginTop: "20px",
-      transition: "background-color 0.3s",
+    },
+    footerText: {
+      marginTop: "15px",
+      fontSize: "0.9rem",
+      color: "#bbb",
     },
   };
-
-  const [requirements, setRequirements] = useState([]);
-  const [formData, setFormData] = useState({
-    class: [],
-    chapter: [],
-    subject: [],
-    writer: [],
-    type: [],
-    numberOfQuestions: "",
-  });
-
-  const handleMultiSelectChange = (selectedList, name) => {
-    setFormData({ ...formData, [name]: selectedList });
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleAddRequirement = () => {
-    // Validate inputs
-    if (
-      formData.class.length === 0 ||
-      formData.chapter.length === 0 ||
-      formData.subject.length === 0 ||
-      formData.writer.length === 0 ||
-      formData.type.length === 0 ||
-      !formData.numberOfQuestions
-    ) {
-      alert("All fields are required. Please fill in all selections and input fields.");
-      return;
-    }
-
-    setRequirements([...requirements, formData]);
-    setFormData({
-      class: [],
-      chapter: [],
-      subject: [],
-      writer: [],
-      type: [],
-      numberOfQuestions: "",
-    });
-    document.querySelectorAll(".multi-select-container").forEach((dropdown) => {
-      dropdown.querySelectorAll("button").forEach((btn) => btn.click());
-    });
-  };
-
-  const totalQuestions = requirements.reduce(
-    (total, req) => total + Number(req.numberOfQuestions),
-    0
-  );
 
   return (
     <div style={styles.container}>
-      <header style={styles.header}>
-        <h1 style={styles.title}>Question Creation Made Simple</h1>
-        <p style={styles.subtitle}>Generate tailored questions with ease!</p>
-      </header>
+      {/* Header */}
+      <h1 style={styles.heading}>UPDATED ACTUAL EXAM MATERIALS</h1>
+      <p style={styles.subheading}>A COMMUNITY YOU CAN BELONG TO</p>
 
-      <div style={styles.formSection}>
-        <Multiselect
-          options={["Class 10", "Class 9", "Class 8"]}
-          isObject={false}
-          onSelect={(selectedList) => handleMultiSelectChange(selectedList, "class")}
-          onRemove={(selectedList) => handleMultiSelectChange(selectedList, "class")}
-          placeholder="Select Classes"
-          style={styles.dropdown}
-        />
-
-        <Multiselect
-          options={["Math", "Science", "English"]}
-          isObject={false}
-          onSelect={(selectedList) => handleMultiSelectChange(selectedList, "subject")}
-          onRemove={(selectedList) => handleMultiSelectChange(selectedList, "subject")}
-          placeholder="Select Subjects"
-          style={styles.dropdown}
-        />
-
-        <Multiselect
-          options={["MCQ", "Multiple Choice", "Creative", "Fill in the Gap"]}
-          isObject={false}
-          onSelect={(selectedList) => handleMultiSelectChange(selectedList, "type")}
-          onRemove={(selectedList) => handleMultiSelectChange(selectedList, "type")}
-          placeholder="Select Question Types"
-          style={styles.dropdown}
-        />
-
-        <Multiselect
-          options={["Chapter 1", "Chapter 2", "Chapter 3"]}
-          isObject={false}
-          onSelect={(selectedList) => handleMultiSelectChange(selectedList, "chapter")}
-          onRemove={(selectedList) => handleMultiSelectChange(selectedList, "chapter")}
-          placeholder="Select Chapters"
-          style={styles.dropdown}
-        />
-
-        <Multiselect
-          options={["Writer A", "Writer B", "Writer C"]}
-          isObject={false}
-          onSelect={(selectedList) => handleMultiSelectChange(selectedList, "writer")}
-          onRemove={(selectedList) => handleMultiSelectChange(selectedList, "writer")}
-          placeholder="Select Writers"
-          style={styles.dropdown}
-        />
-
-        <input
-          type="number"
-          name="numberOfQuestions"
-          value={formData.numberOfQuestions}
-          onChange={handleInputChange}
-          placeholder="Enter Number of Questions"
-          style={styles.input}
-        />
-
-        <button onClick={handleAddRequirement} style={styles.button}>
-          Add Question Details
-        </button>
+      {/* Stats */}
+      <div style={styles.stats}>
+        <div style={styles.statItem}>
+          <p style={styles.statValue}>94%</p>
+          <p>Said the test questions were almost same</p>
+        </div>
+        <div style={styles.statItem}>
+          <p style={styles.statValue}>97%</p>
+          <p>Passed the exams with materials</p>
+        </div>
+        <div style={styles.statItem}>
+          <p style={styles.statValue}>98%</p>
+          <p>Found the study guides effective and helpful</p>
+        </div>
       </div>
 
-      <div>
-        {requirements.map((req, index) => (
-          <div key={index} style={styles.card}>
-            <p>Class: {req.class.join(", ")}</p>
-            <p>Subject: {req.subject.join(", ")}</p>
-            <p>Type: {req.type.join(", ")}</p>
-            <p>Chapter: {req.chapter.join(", ")}</p>
-            <p>Writer: {req.writer.join(", ")}</p>
-            <p>Number of Questions: {req.numberOfQuestions}</p>
-          </div>
-        ))}
+      {/* Form */}
+      <div style={styles.formContainer}>
+        <div style={styles.inputGroup}>
+          <select style={styles.dropdown}>
+            <option>Select Provider</option>
+            <option>Provider 1</option>
+            <option>Provider 2</option>
+          </select>
+          <input
+            type="text"
+            placeholder="Exam Code Or Keyword..."
+            style={styles.input}
+          />
+          <button style={styles.button}>VIEW ALL EXAMS</button>
+        </div>
       </div>
 
-      <div style={styles.totalSection}>Total Questions: {totalQuestions}</div>
 
-      <button style={styles.generateButton}>Generate Questions</button>
+
+      {/* Footer Text */}
+      <p style={styles.footerText}>
+        245 People Signed up in the Last 24H • Updated Exam Content • 1200+ Exams
+      </p>
+
+      <CertificationProviders />
+      <Testimonials />
+      <CounterSection />
     </div>
   );
 };

@@ -1,5 +1,7 @@
+"use client";
+
 // Profile Page
-export const Profile = () => {
+const Profile = () => {
   const styles = {
     page: {
       padding: "20px",
@@ -24,3 +26,5 @@ export const Profile = () => {
     </div>
   );
 };
+
+export default Profile; // Default Export

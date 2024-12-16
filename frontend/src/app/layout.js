@@ -1,7 +1,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 //import "./globals.css";
-import Navbar from "../components/navbar";
 import { Footer } from "../components/footer";
+import TopNavbar from "@/components/topnavber";
+import MainNavbar from "@/components/mainnavber";
 
 export default function RootLayout({ children }) {
   const styles = {
@@ -19,7 +20,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body style={styles.body}>
-        <Navbar />
+       <TopNavbar />
+       <MainNavbar />
         <main style={styles.content}>{children}</main>
         <Footer />
       </body>
