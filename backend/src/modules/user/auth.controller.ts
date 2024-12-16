@@ -1,26 +1,27 @@
 import { Body, Controller, Inject, Post } from "@nestjs/common";
-import { UserService } from "./user.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UserEntity } from "../../database/entities/user.entity";
 import { ApiConsumes, ApiProduces } from "@nestjs/swagger";
 import { LoginDto } from "./dto/login.dto";
+import { PublicBaseController } from "../../guards/public-base-controller";
+import { AuthService } from "./auth.service";
 
 @Controller("auth")
-export class AuthController {
+export class AuthController extends PublicBaseController {
   @Inject()
-  private readonly userService: UserService;
+  private readonly authService: AuthService;
 
   @Post("login")
   @ApiConsumes("application/json", `application/x-www-form-urlencoded`)
   @ApiProduces("application/json")
   async login(@Body() reqDto: LoginDto): Promise<UserEntity> {
-    return this.userService.login(reqDto);
+    return this.authService.login(reqDto);
   }
 
   @Post("registration")
   @ApiConsumes("application/json", `application/x-www-form-urlencoded`)
   @ApiProduces("application/json")
   async registration(@Body() reqDto: CreateUserDto): Promise<UserEntity> {
-    return this.userService.create(reqDto);
+    return this.authService.registration(reqDto);
   }
 }

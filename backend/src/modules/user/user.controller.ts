@@ -1,15 +1,21 @@
-import { Body, Controller, Get, Inject, Post } from "@nestjs/common";
+import { Body, Controller, Get, Inject, Param, ParseIntPipe, Post, Put } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UserEntity } from "../../database/entities/user.entity";
-import { ApiConsumes, ApiProduces } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiConsumes, ApiProduces } from "@nestjs/swagger";
+import { HasPermission } from "../../config/meta.data";
+import { Role } from "../../config/enum";
+import { PrivateBaseController } from "../../guards/private-base-controller";
+import { BEARER_TOKEN_KEY } from "../../config/constant";
+import { ChangeRoleDto } from "./dto/change-role.dto";
 
 @Controller("users")
-export class UserController {
+export class UserController extends PrivateBaseController {
   @Inject()
   private readonly userService: UserService;
 
   @Post()
+  @HasPermission([Role.ADMIN])
   @ApiConsumes("application/json", `application/x-www-form-urlencoded`)
   @ApiProduces("application/json")
   async createUser(@Body() reqDto: CreateUserDto): Promise<UserEntity> {
@@ -17,7 +23,22 @@ export class UserController {
   }
 
   @Get()
+  @HasPermission([Role.ADMIN])
   async getAll(): Promise<UserEntity[]> {
     return this.userService.getAll();
+  }
+
+  @Get(":id")
+  @HasPermission([Role.ADMIN])
+  async getOne(@Param("id") id: string): Promise<UserEntity> {
+    return this.userService.getOneById(id);
+  }
+
+  @Put("change-role")
+  @HasPermission([Role.ADMIN])
+  @ApiConsumes("application/json", `application/x-www-form-urlencoded`)
+  @ApiProduces("application/json")
+  async changeRole(@Body() reqDto: ChangeRoleDto): Promise<UserEntity> {
+    return this.userService.changeRole(reqDto);
   }
 }

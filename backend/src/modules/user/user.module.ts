@@ -7,6 +7,7 @@ import { UserEntity } from "../../database/entities/user.entity";
 import { AuthController } from "./auth.controller";
 import { JwtModule } from "@nestjs/jwt";
 import { JWT_EXPIRE, JWT_SECRET } from "../../config/constant";
+import { AuthService } from "./auth.service";
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { JWT_EXPIRE, JWT_SECRET } from "../../config/constant";
     }),
   ],
   controllers: [AuthController, UserController],
-  providers: [UserService, UserRepository],
+  providers: [AuthService, UserService, UserRepository],
   exports: [UserService],
 })
 export class UserModule {}
