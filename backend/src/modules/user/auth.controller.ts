@@ -3,8 +3,8 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { UserEntity } from "../../database/entities/user.entity";
 import { ApiConsumes, ApiProduces } from "@nestjs/swagger";
 import { LoginDto } from "./dto/login.dto";
-import { PublicBaseController } from "../../guards/public-base-controller";
 import { AuthService } from "./auth.service";
+import { PublicBaseController } from "../../guards/public.base.controller";
 
 @Controller("auth")
 export class AuthController extends PublicBaseController {

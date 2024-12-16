@@ -1,13 +1,12 @@
-import { Body, Controller, Get, Inject, Param, ParseIntPipe, Post, Put } from "@nestjs/common";
+import { Body, Controller, Get, Inject, Param, Post, Put } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UserEntity } from "../../database/entities/user.entity";
-import { ApiBearerAuth, ApiConsumes, ApiProduces } from "@nestjs/swagger";
+import { ApiConsumes, ApiProduces } from "@nestjs/swagger";
 import { HasPermission } from "../../config/meta.data";
 import { Role } from "../../config/enum";
-import { PrivateBaseController } from "../../guards/private-base-controller";
-import { BEARER_TOKEN_KEY } from "../../config/constant";
 import { ChangeRoleDto } from "./dto/change-role.dto";
+import { PrivateBaseController } from "../../guards/private.base.controller";
 
 @Controller("users")
 export class UserController extends PrivateBaseController {
