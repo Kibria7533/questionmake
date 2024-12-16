@@ -1,9 +1,11 @@
 import { Entity, ObjectIdColumn, Column } from "typeorm";
+import { ObjectId } from "mongodb";
+import { Role } from "../../config/enum";
 
 @Entity()
 export class UserEntity {
   @ObjectIdColumn()
-  id: string;
+  _id: ObjectId;
 
   @Column()
   name: string;
@@ -14,6 +16,12 @@ export class UserEntity {
   @Column()
   email: string;
 
+  @Column({ select: false })
+  password: string;
+
   @Column()
   dob: string;
+
+  @Column({ select: false, enum: Role, default: Role.REGULAR })
+  role: number;
 }

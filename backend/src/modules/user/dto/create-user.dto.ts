@@ -30,6 +30,16 @@ export class CreateUserDto {
   email: string;
 
   @IsNotEmpty()
+  @IsString()
+  @ApiProperty({ type: String, default: "1234" })
+  password: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty({ type: String, default: "1234" })
+  confirm_password: string;
+
+  @IsNotEmpty()
   @IsDateString()
   @ApiProperty({ type: String, default: "2024-12-12" })
   dob: string;
