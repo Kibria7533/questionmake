@@ -11,7 +11,7 @@ const Navbar = () => {
   useEffect(() => {
     const checkLoginStatus = async () => {
       const loggedIn = await fakeAuthCheck();
-      setIsLoggedIn(loggedIn);
+      setIsLoggedIn(false);
     };
 
     checkLoginStatus();
