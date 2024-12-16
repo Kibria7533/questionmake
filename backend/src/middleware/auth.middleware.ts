@@ -19,7 +19,7 @@ export class AuthMiddleware implements NestMiddleware {
     const userToken: any = req.headers[BEARER_TOKEN_KEY];
     const token: string = userToken?.split(" ")[1];
 
-    console.log("middleware access token => ", token);
+    console.log("token => ", token);
 
     if (!token) {
       return next();
@@ -27,7 +27,7 @@ export class AuthMiddleware implements NestMiddleware {
 
     const jwtPayload: any = this.jwtService.decode(token, { json: true });
 
-    console.log("jwtPayload => ", jwtPayload.sub);
+    console.log("sub => ", jwtPayload.sub);
 
     if (!jwtPayload?.sub) {
       return next();
