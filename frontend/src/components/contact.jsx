@@ -6,17 +6,21 @@ export const Contact = () => {
     page: {
       padding: "20px",
       fontFamily: "Arial, sans-serif",
-      backgroundImage: "url('https://via.placeholder.com/1200x800?text=Educational+Background')",
+      backgroundImage: "url('https://images.unsplash.com/photo-1517841905240-472988babdf9?fit=crop&w=1600&q=80')",
       backgroundSize: "cover",
       backgroundPosition: "center",
       color: "#333",
+      minHeight: "100vh",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
     },
     overlay: {
-      backgroundColor: "rgba(255, 255, 255, 0.8)",
+      backgroundColor: "rgba(255, 255, 255, 0.9)",
       padding: "30px",
       borderRadius: "10px",
       maxWidth: "600px",
-      margin: "0 auto",
+      width: "100%",
       boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
     },
     title: {
@@ -38,6 +42,10 @@ export const Contact = () => {
       outline: "none",
       transition: "box-shadow 0.3s",
     },
+    inputFocus: {
+      boxShadow: "0 0 5px rgba(0, 64, 128, 0.7)",
+      border: "1px solid rgba(0, 64, 128, 0.7)",
+    },
     textarea: {
       padding: "15px",
       fontSize: "1rem",
@@ -58,6 +66,10 @@ export const Contact = () => {
       cursor: "pointer",
       transition: "background-color 0.3s, transform 0.2s",
     },
+    buttonHover: {
+      backgroundColor: "#003060",
+      transform: "scale(1.02)",
+    },
   };
 
   return (
@@ -69,19 +81,27 @@ export const Contact = () => {
             type="text"
             placeholder="Your Name"
             style={styles.input}
+            onFocus={(e) => (e.target.style.boxShadow = styles.inputFocus.boxShadow)}
+            onBlur={(e) => (e.target.style.boxShadow = "none")}
           />
           <input
             type="email"
             placeholder="Your Email"
             style={styles.input}
+            onFocus={(e) => (e.target.style.boxShadow = styles.inputFocus.boxShadow)}
+            onBlur={(e) => (e.target.style.boxShadow = "none")}
           />
           <textarea
             placeholder="Your Message"
             style={styles.textarea}
+            onFocus={(e) => (e.target.style.boxShadow = styles.inputFocus.boxShadow)}
+            onBlur={(e) => (e.target.style.boxShadow = "none")}
           ></textarea>
           <button
             type="submit"
             style={styles.button}
+            onMouseOver={(e) => (e.target.style.backgroundColor = styles.buttonHover.backgroundColor)}
+            onMouseOut={(e) => (e.target.style.backgroundColor = styles.button.backgroundColor)}
           >
             Send Message
           </button>

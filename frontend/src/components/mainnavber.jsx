@@ -3,7 +3,9 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaUserCircle } from "react-icons/fa";
+import { useRouter } from "next/navigation";
+import { useAuth } from "./AuthContext"; // Import AuthContext
 
 const menuData = [
   {
@@ -33,15 +35,18 @@ const menuData = [
 ];
 
 const MainNavbar = () => {
+  const { isLoggedIn, logout } = useAuth(); // Use global authentication state
+  const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
+  const handleLogout = () => {
+    logout();
+    router.push("/login"); // Redirect to login page after logout
+  };
 
   return (
     <nav className="navbar navbar-expand-md navbar-dark bg-dark sticky-top px-3">
       <div className="container-fluid">
-
-
         {/* Toggler for small screens */}
         <button
           className="navbar-toggler"
@@ -114,21 +119,17 @@ const MainNavbar = () => {
               </div>
             </li>
 
-            {/* News */}
+            {/* Other Links */}
             <li className="nav-item">
               <a className="nav-link" href="/news">
                 NEWS
               </a>
             </li>
-
-            {/* View All Exams */}
             <li className="nav-item">
               <a className="nav-link" href="/view-all-exam">
                 VIEW ALL EXAMS
               </a>
             </li>
-
-            {/* Contact */}
             <li className="nav-item">
               <a className="nav-link" href="/contact">
                 CONTACT
@@ -136,28 +137,63 @@ const MainNavbar = () => {
             </li>
           </ul>
 
-          {/* Search, Login, and Signup */}
+          {/* Search, Login/Signup or Profile */}
           <div className="d-flex align-items-center gap-3">
             <button className="btn btn-primary">
               <FaSearch color="white" />
             </button>
-            <div>
-              <a
-                href="/login"
-                className="text-white me-2"
-                style={{ textDecoration: "none" }}
-              >
-                Login
-              </a>
-              |
-              <a
-                href="/signup"
-                className="text-white ms-2"
-                style={{ textDecoration: "none" }}
-              >
-                Sign up
-              </a>
-            </div>
+
+            {isLoggedIn ? (
+              // Profile Dropdown
+              <div className="dropdown">
+                <button
+                  className="btn btn-outline-light dropdown-toggle"
+                  type="button"
+                  id="profileDropdown"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  <FaUserCircle size={20} /> Profile
+                </button>
+                <ul
+                  className="dropdown-menu dropdown-menu-end"
+                  aria-labelledby="profileDropdown"
+                >
+                  <li>
+                    <a className="dropdown-item" href="/profile">
+                      View Profile
+                    </a>
+                  </li>
+                  <li>
+                    <button
+                      className="dropdown-item text-danger"
+                      onClick={handleLogout}
+                    >
+                      Logout
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            ) : (
+              // Login and Signup Links
+              <div>
+                <a
+                  href="/login"
+                  className="text-white me-2"
+                  style={{ textDecoration: "none" }}
+                >
+                  Login
+                </a>
+                |
+                <a
+                  href="/signup"
+                  className="text-white ms-2"
+                  style={{ textDecoration: "none" }}
+                >
+                  Sign up
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </div>

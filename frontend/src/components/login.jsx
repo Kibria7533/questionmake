@@ -33,6 +33,9 @@ const Login = () => {
         // Store the access token in localStorage
         localStorage.setItem("access_token", data.access_token);
         router.push("/profile"); // Redirect to the profile page
+        setTimeout(() => {
+          window.location.reload();
+        }, 50); // Small delay to ensure navigation happens first
       } else {
         throw new Error(data.message || "Login failed. Please try again.");
       }
