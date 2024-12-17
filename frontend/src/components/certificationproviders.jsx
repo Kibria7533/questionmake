@@ -115,7 +115,7 @@ const CertificationProviders = () => {
                 <ul style={styles.examList} className="list-unstyled">
                   {provider.exams.map((exam, idx) => (
                     <li key={idx}>
-                      <a href="#" style={styles.examItem}>
+                      <a href={`/exams/${idx}`} style={styles.examItem}>
                         {exam}
                       </a>
                     </li>

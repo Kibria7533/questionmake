@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-// import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { FaSearch } from "react-icons/fa";
 
 const menuData = [
@@ -35,22 +34,18 @@ const menuData = [
 const MainNavbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // Load Bootstrap JS for dropdown functionality
-  // useEffect(() => {
-  //   import("bootstrap/dist/js/bootstrap.bundle.min.js");
-  // }, []);
-
-  const handleMouseEnter = () => {
-    setIsDropdownOpen(true);
-  };
-
-  const handleMouseLeave = () => {
-    setIsDropdownOpen(false);
-  };
+  const handleMouseEnter = () => setIsDropdownOpen(true);
+  const handleMouseLeave = () => setIsDropdownOpen(false);
 
   return (
-    <nav className="navbar navbar-expand-md navbar-dark bg-dark px-4">
+    <nav className="navbar navbar-expand-md navbar-dark bg-dark sticky-top px-4">
       <div className="container-fluid">
+        {/* Brand */}
+        <a className="navbar-brand fw-bold" href="/">
+          QUESTIONHAT
+        </a>
+
+        {/* Navbar Links */}
         <ul className="navbar-nav me-auto mb-2 mb-lg-0">
           <li className="nav-item">
             <a className="nav-link active" href="/">
@@ -60,7 +55,9 @@ const MainNavbar = () => {
 
           {/* Mega Menu */}
           <li
-            className={`nav-item dropdown position-static ${isDropdownOpen ? "show" : ""}`}
+            className={`nav-item dropdown position-static ${
+              isDropdownOpen ? "show" : ""
+            }`}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
@@ -69,13 +66,14 @@ const MainNavbar = () => {
               href="#"
               id="navbarDropdown"
               role="button"
-              data-bs-toggle="dropdown"
               aria-expanded={isDropdownOpen}
             >
               POPULAR EXAMS
             </a>
             <div
-              className={`dropdown-menu w-100 p-3 shadow ${isDropdownOpen ? "show" : ""}`}
+              className={`dropdown-menu w-100 p-3 shadow ${
+                isDropdownOpen ? "show" : ""
+              }`}
               aria-labelledby="navbarDropdown"
             >
               <div className="container">
@@ -103,6 +101,13 @@ const MainNavbar = () => {
             </div>
           </li>
 
+          {/* New News Menu */}
+          <li className="nav-item">
+            <a className="nav-link" href="/news">
+              NEWS
+            </a>
+          </li>
+
           <li className="nav-item">
             <a className="nav-link" href="/view-all-exam">
               VIEW ALL EXAMS
@@ -121,19 +126,11 @@ const MainNavbar = () => {
             <FaSearch color="white" />
           </button>
           <div>
-            <a
-              href="/login"
-              className="text-white me-2"
-              style={{ textDecoration: "none" }}
-            >
+            <a href="/login" className="text-white me-2" style={{ textDecoration: "none" }}>
               Login
             </a>
             |
-            <a
-              href="/signup"
-              className="text-white ms-2"
-              style={{ textDecoration: "none" }}
-            >
+            <a href="/signup" className="text-white ms-2" style={{ textDecoration: "none" }}>
               Sign up
             </a>
           </div>
