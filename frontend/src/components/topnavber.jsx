@@ -6,11 +6,11 @@ const TopNavbar = () => {
     <div className="d-flex justify-content-between align-items-center py-3 px-4">
       <div className="d-flex align-items-center">
         {/* Logo */}
-        <img
+        {/* <img
           src="logo3.png"
           alt="QuestionHat Logo"
           style={{ height: "50px", marginRight: "10px" }}
-        />
+        /> */}
         {/* QUESTIONHAT Text */}
         <div
           className="text-primary"
