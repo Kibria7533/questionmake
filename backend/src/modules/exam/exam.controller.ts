@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Inject, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Inject, Param, ParseIntPipe, Post, Put } from "@nestjs/common";
 import { CreateExamDto } from "./dto/create-exam.dto";
 import { ApiConsumes, ApiProduces } from "@nestjs/swagger";
 import { ExamService } from "./exam.service";
@@ -22,7 +22,7 @@ export class ExamController extends PublicBaseController {
   @Put(":id")
   @ApiConsumes("application/json", `application/x-www-form-urlencoded`)
   @ApiProduces("application/json")
-  async update(@Param("id") id: string, @Body() reqDto: UpdateExamDto): Promise<ExamEntity> {
+  async update(@Param("id", ParseIntPipe) id: number, @Body() reqDto: UpdateExamDto): Promise<ExamEntity> {
     return this.service.update(id, reqDto);
   }
 
@@ -32,12 +32,12 @@ export class ExamController extends PublicBaseController {
   }
 
   @Get(":id")
-  async getOne(@Param("id") id: string): Promise<ExamEntity> {
+  async getOne(@Param("id", ParseIntPipe) id: number): Promise<ExamEntity> {
     return this.service.getOneById(id);
   }
 
   @Delete(":id")
-  async delete(@Param("id") id: string): Promise<ExamCategoryEntity> {
+  async delete(@Param("id", ParseIntPipe) id: number): Promise<ExamCategoryEntity> {
     return this.service.delete(id);
   }
 }

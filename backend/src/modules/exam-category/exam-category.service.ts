@@ -18,7 +18,7 @@ export class ExamCategoryService {
     return this.repository.save(category);
   }
 
-  async update(id: string, reqDto: UpdateExamCategoryDto): Promise<ExamCategoryEntity> {
+  async update(id: number, reqDto: UpdateExamCategoryDto): Promise<ExamCategoryEntity> {
     if (await this.isCategoryNameExist(reqDto.name, id)) {
       throw new BadRequestException("Category already exist");
     }
@@ -32,19 +32,19 @@ export class ExamCategoryService {
     return this.repository.getAll();
   }
 
-  async getOneByIdOrFail(id: string): Promise<ExamCategoryEntity> {
+  async getOneByIdOrFail(id: number): Promise<ExamCategoryEntity> {
     return this.repository.getOneByIdOrFail(id);
   }
 
-  async getOneById(id: string): Promise<ExamCategoryEntity> {
+  async getOneById(id: number): Promise<ExamCategoryEntity> {
     return this.repository.getOneById(id);
   }
 
-  async getOneWithExams(id: string): Promise<ExamCategoryEntity> {
+  async getOneWithExams(id: number): Promise<ExamCategoryEntity> {
     return this.repository.getOneWithExams(id);
   }
 
-  async isCategoryNameExist(name: string, id?: string): Promise<boolean> {
+  async isCategoryNameExist(name: string, id?: number): Promise<boolean> {
     const isExist: ExamCategoryEntity = await this.repository.isCategoryNameExist(name, id);
     console.log(isExist);
     return !!isExist;

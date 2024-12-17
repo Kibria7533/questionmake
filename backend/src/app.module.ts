@@ -9,6 +9,7 @@ import { ExamModule } from "./modules/exam/exam.module";
 import { JwtModule } from "@nestjs/jwt";
 import { JWT_EXPIRE, JWT_SECRET } from "./config/constant";
 import { ExamCategoryModule } from "./modules/exam-category/exam-category.module";
+import { AuthModule } from "./modules/auth/auth.module";
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ExamCategoryModule } from "./modules/exam-category/exam-category.module
       secret: JWT_SECRET,
       signOptions: { expiresIn: JWT_EXPIRE },
     }),
+    AuthModule,
     UserModule,
     ExamCategoryModule,
     ExamModule,

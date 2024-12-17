@@ -1,12 +1,11 @@
-import { Column, Entity, ObjectIdColumn, OneToMany } from "typeorm";
-import { ObjectId } from "mongodb";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { TABLE_EXAM_CATEGORIES } from "../../config/database.table";
 import { ExamEntity } from "./exam.entity";
 
 @Entity(TABLE_EXAM_CATEGORIES)
 export class ExamCategoryEntity {
-  @ObjectIdColumn()
-  _id: ObjectId;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column()
   name: string;

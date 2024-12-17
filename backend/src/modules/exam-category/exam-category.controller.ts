@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Inject, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Inject, Param, ParseIntPipe, Post, Put } from "@nestjs/common";
 import { ApiConsumes, ApiProduces } from "@nestjs/swagger";
 import { ExamCategoryService } from "./exam-category.service";
 import { PublicBaseController } from "../../guards/public.base.controller";
@@ -21,7 +21,7 @@ export class ExamCategoryController extends PublicBaseController {
   @Put(":id")
   @ApiConsumes("application/json", `application/x-www-form-urlencoded`)
   @ApiProduces("application/json")
-  async update(@Param("id") id: string, @Body() reqDto: UpdateExamCategoryDto): Promise<ExamCategoryEntity> {
+  async update(@Param("id", ParseIntPipe) id: number, @Body() reqDto: UpdateExamCategoryDto): Promise<ExamCategoryEntity> {
     return this.service.update(id, reqDto);
   }
 
@@ -31,12 +31,12 @@ export class ExamCategoryController extends PublicBaseController {
   }
 
   @Get(":id")
-  async getOne(@Param("id") id: string): Promise<ExamCategoryEntity> {
+  async getOne(@Param("id", ParseIntPipe) id: number): Promise<ExamCategoryEntity> {
     return this.service.getOneById(id);
   }
 
   @Get(":id/exams")
-  async getOneWithExams(@Param("id") id: string): Promise<ExamCategoryEntity> {
+  async getOneWithExams(@Param("id", ParseIntPipe) id: number): Promise<ExamCategoryEntity> {
     return this.service.getOneWithExams(id);
   }
 

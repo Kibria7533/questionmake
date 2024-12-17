@@ -14,7 +14,7 @@ export class ExamService {
     return this.repository.save(exam);
   }
 
-  async update(id: string, reqDto: UpdateExamDto): Promise<ExamEntity> {
+  async update(id: number, reqDto: UpdateExamDto): Promise<ExamEntity> {
     const exam: ExamEntity = await this.getOneByIdOrFail(id);
     Object.assign(exam, reqDto);
     return this.repository.save(exam);
@@ -24,15 +24,15 @@ export class ExamService {
     return this.repository.getAll();
   }
 
-  async getOneByIdOrFail(id: string): Promise<ExamEntity> {
+  async getOneByIdOrFail(id: number): Promise<ExamEntity> {
     return this.repository.getOneByIdOrFail(id);
   }
 
-  async getOneById(id: string): Promise<ExamEntity> {
+  async getOneById(id: number): Promise<ExamEntity> {
     return this.repository.getOneById(id);
   }
 
-  async delete(id: string): Promise<any> {
+  async delete(id: number): Promise<any> {
     return this.repository.delete(id);
   }
 }

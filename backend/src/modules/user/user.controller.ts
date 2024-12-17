@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Get, Inject, Param, ParseIntPipe, Post, Put } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UserEntity } from "../../database/entities/user.entity";
@@ -29,7 +29,7 @@ export class UserController extends PrivateBaseController {
 
   @Get(":id")
   @HasPermission([Role.ADMIN])
-  async getOne(@Param("id") id: string): Promise<UserEntity> {
+  async getOne(@Param("id", ParseIntPipe) id: number): Promise<UserEntity> {
     return this.userService.getOneById(id);
   }
 

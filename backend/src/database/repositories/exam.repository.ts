@@ -15,11 +15,11 @@ export class ExamRepository extends Repository<ExamEntity> {
     return this.find();
   }
 
-  async getOneById(id: string): Promise<ExamEntity> {
-    return this.findOne({ where: { _id: new ObjectId(id) } });
+  async getOneById(id: number): Promise<ExamEntity> {
+    return this.findOne({ where: { id } });
   }
 
-  async getOneByIdOrFail(id: string): Promise<ExamEntity> {
-    return this.findOneOrFail({ where: { _id: new ObjectId(id) } });
+  async getOneByIdOrFail(id: number): Promise<ExamEntity> {
+    return this.findOneOrFail({ where: { id } });
   }
 }

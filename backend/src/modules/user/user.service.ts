@@ -15,7 +15,7 @@ export class UserService {
   async create(reqDto: CreateUserDto): Promise<UserEntity> {
     const isExist: UserEntity = await this.getOneByMobile(reqDto.mobile);
 
-    if (isExist?._id) {
+    if (isExist?.id) {
       throw new BadRequestException("User already exists");
     }
 
@@ -51,7 +51,7 @@ export class UserService {
     return this.userRepository.getAll();
   }
 
-  async getAuthUser(sub: string): Promise<UserEntity> {
+  async getAuthUser(sub: number): Promise<UserEntity> {
     return this.userRepository.getAuthUser(sub);
   }
 
@@ -59,7 +59,7 @@ export class UserService {
     return this.userRepository.getOneByMobile(mobile);
   }
 
-  async getOneById(id: string): Promise<UserEntity> {
+  async getOneById(id: number): Promise<UserEntity> {
     return this.userRepository.getOneById(id);
   }
 }

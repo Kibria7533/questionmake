@@ -1,8 +1,7 @@
-import { Repository, Not } from "typeorm";
+import { Not, Repository } from "typeorm";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ExamCategoryEntity } from "../entities/exam-category.entity";
-import { ObjectId } from "mongodb";
 
 @Injectable()
 export class ExamCategoryRepository extends Repository<ExamCategoryEntity> {
@@ -14,24 +13,24 @@ export class ExamCategoryRepository extends Repository<ExamCategoryEntity> {
     return this.find();
   }
 
-  async getOneById(id: string): Promise<ExamCategoryEntity> {
-    return this.findOne({ where: { _id: new ObjectId(id) } });
+  async getOneById(id: number): Promise<ExamCategoryEntity> {
+    return this.findOne({ where: { id } });
   }
 
-  async getOneWithExams(id: string): Promise<ExamCategoryEntity> {
-    return this.findOne({ where: { _id: new ObjectId(id) }, relations: ["exams"] });
+  async getOneWithExams(id: number): Promise<ExamCategoryEntity> {
+    return this.findOne({ where: { id }, relations: ["exams"] });
   }
 
-  async isCategoryNameExist(name: string, id?: string): Promise<ExamCategoryEntity> {
+  async isCategoryNameExist(name: string, id?: number): Promise<ExamCategoryEntity> {
     const query: ExamCategoryEntity = new ExamCategoryEntity();
     query.name = name;
     if (id) {
-      query._id = { $ne: new ObjectId(id) } as any;
+      query.id = Not(id) as any;
     }
     return this.findOne({ where: query });
   }
 
-  async getOneByIdOrFail(id: string): Promise<ExamCategoryEntity> {
-    return this.findOneOrFail({ where: { _id: new ObjectId(id) } });
+  async getOneByIdOrFail(id: number): Promise<ExamCategoryEntity> {
+    return this.findOneOrFail({ where: { id } });
   }
 }

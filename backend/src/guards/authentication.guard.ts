@@ -13,7 +13,7 @@ export class AuthenticationGuard implements CanActivate {
     const requiredRoles: number[] = this.reflector.get<number[]>(PERMISSION_KEY, context.getHandler());
     const user: UserEntity = AuthUser.get();
 
-    if (!user?._id) {
+    if (!user?.id) {
       throw new UnauthorizedException("Unauthenticated Action. Login Required!");
     }
 

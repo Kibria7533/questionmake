@@ -4,7 +4,7 @@ import { UserEntity } from "../../database/entities/user.entity";
 import { LoginDto } from "./dto/login.dto";
 import * as bcrypt from "bcrypt";
 import { JwtService } from "@nestjs/jwt";
-import { UserService } from "./user.service";
+import { UserService } from "../user/user.service";
 
 @Injectable()
 export class AuthService {
@@ -27,7 +27,7 @@ export class AuthService {
       throw new BadRequestException("User or Password doesn't match");
     }
 
-    const payload = { sub: user._id };
+    const payload = { sub: user.id };
 
     return {
       access_token: await this.jwtService.signAsync(payload),

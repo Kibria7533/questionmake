@@ -1,5 +1,6 @@
-import { IsMongoId, IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsString } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
+import { IsNumeric } from "../../../config/validations/is-number-string.validator";
 
 export class CreateExamDto {
   @IsNotEmpty()
@@ -8,7 +9,7 @@ export class CreateExamDto {
   name: string;
 
   @IsNotEmpty()
-  @IsMongoId()
-  @ApiProperty({ type: String })
-  exam_category_id: string;
+  @IsNumeric()
+  @ApiProperty({ type: Number })
+  exam_category_id: number;
 }
