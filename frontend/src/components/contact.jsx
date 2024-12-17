@@ -1,7 +1,7 @@
 "use client";
 
 // Contact Page
-export const Contact = () => {
+const Contact = () => {
   const styles = {
     page: {
       padding: "20px",
@@ -110,3 +110,5 @@ export const Contact = () => {
     </div>
   );
 };
+
+export default Contact;

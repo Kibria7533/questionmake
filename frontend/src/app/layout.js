@@ -5,6 +5,7 @@ import TopNavbar from "@/components/topnavber";
 import MainNavbar from "@/components/mainnavber";
 import { AuthProvider } from "@/components/AuthContext";
 
+
 export default function RootLayout({ children }) {
   const styles = {
     body: {

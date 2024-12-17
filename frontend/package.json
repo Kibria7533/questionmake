@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
-    "@material-tailwind/react": "^2.1.10",
     "@popperjs/core": "^2.11.8",
     "@szhsin/react-menu": "^4.2.3",
     "bootstrap": "^5.3.3",
