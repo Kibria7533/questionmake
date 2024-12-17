@@ -1,8 +1,9 @@
 import { Entity, ObjectIdColumn, Column } from "typeorm";
 import { ObjectId } from "mongodb";
 import { Role } from "../../config/enum";
+import { TABLE_USERS } from "../../config/database.table";
 
-@Entity()
+@Entity(TABLE_USERS)
 export class UserEntity {
   @ObjectIdColumn()
   _id: ObjectId;

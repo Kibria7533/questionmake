@@ -5,9 +5,23 @@ import { UserModule } from "./modules/user/user.module";
 import DatabaseConfig from "./config/database.config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthMiddleware } from "./middleware/auth.middleware";
+import { ExamModule } from "./modules/exam/exam.module";
+import { JwtModule } from "@nestjs/jwt";
+import { JWT_EXPIRE, JWT_SECRET } from "./config/constant";
+import { ExamCategoryModule } from "./modules/exam-category/exam-category.module";
 
 @Module({
-  imports: [TypeOrmModule.forRoot(DatabaseConfig), UserModule],
+  imports: [
+    TypeOrmModule.forRoot(DatabaseConfig),
+    JwtModule.register({
+      global: true,
+      secret: JWT_SECRET,
+      signOptions: { expiresIn: JWT_EXPIRE },
+    }),
+    UserModule,
+    ExamCategoryModule,
+    ExamModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
