@@ -5,3 +5,7 @@ export const TABLE_CLASSES = "classes";
 export const TABLE_SUBJECTS = "subjects";
 export const TABLE_CHAPTERS = "chapters";
 export const TABLE_QUESTION_TYPES = "question_types";
+export const TABLE_PERMISSION_MODULES = "permission_modules";
+export const TABLE_PERMISSIONS = "permissions";
+export const TABLE_ROLES = "roles";
+export const TABLE_ROLE_PERMISSIONS = "role_permissions";

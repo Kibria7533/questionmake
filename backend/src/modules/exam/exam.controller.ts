@@ -5,7 +5,7 @@ import { ExamService } from "./exam.service";
 import { PublicBaseController } from "../../guards/public.base.controller";
 import { ExamEntity } from "../../database/entities/exam.entity";
 import { UpdateExamDto } from "./dto/update-exam.dto";
-import { ExamCategoryEntity } from "../../database/entities/exam-category.entity";
+import { DeleteResult } from "typeorm/query-builder/result/DeleteResult";
 
 @Controller("exam")
 export class ExamController extends PublicBaseController {
@@ -37,7 +37,7 @@ export class ExamController extends PublicBaseController {
   }
 
   @Delete(":id")
-  async delete(@Param("id", ParseIntPipe) id: number): Promise<ExamCategoryEntity> {
+  async delete(@Param("id", ParseIntPipe) id: number): Promise<DeleteResult> {
     return this.service.delete(id);
   }
 }

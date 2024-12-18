@@ -4,6 +4,7 @@ import { CreateChapterDto } from "./dto/create-chapter.dto";
 import { Not } from "typeorm";
 import { ChapterEntity } from "../../database/entities/chapter.entity";
 import { ChapterRepository } from "../../database/repositories/chapter.repository";
+import { DeleteResult } from "typeorm/query-builder/result/DeleteResult";
 
 @Injectable()
 export class ChapterService {
@@ -51,7 +52,7 @@ export class ChapterService {
     return !!isExist;
   }
 
-  async delete(id: string): Promise<any> {
+  async delete(id: string): Promise<DeleteResult> {
     return this.repository.delete(id);
   }
 }

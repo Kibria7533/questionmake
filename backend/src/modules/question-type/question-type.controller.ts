@@ -5,6 +5,7 @@ import { UpdateQuestionTypeDto } from "./dto/update-question-type.dto";
 import { CreateQuestionTypeDto } from "./dto/create-question-type.dto";
 import { PrivateBaseController } from "../../guards/private.base.controller";
 import { QuestionTypeEntity } from "../../database/entities/question-type.entity";
+import { DeleteResult } from "typeorm/query-builder/result/DeleteResult";
 
 @Controller("question-types")
 export class QuestionTypeController extends PrivateBaseController {
@@ -36,7 +37,7 @@ export class QuestionTypeController extends PrivateBaseController {
   }
 
   @Delete(":id")
-  async delete(@Param("id") id: string): Promise<QuestionTypeEntity> {
+  async delete(@Param("id") id: string): Promise<DeleteResult> {
     return this.service.delete(id);
   }
 }

@@ -5,6 +5,7 @@ import { UpdateClassDto } from "./dto/update-class.dto";
 import { CreateClassDto } from "./dto/create-class.dto";
 import { PrivateBaseController } from "../../guards/private.base.controller";
 import { ClassEntity } from "../../database/entities/class.entity";
+import { DeleteResult } from "typeorm/query-builder/result/DeleteResult";
 
 @Controller("classes")
 export class ClassController extends PrivateBaseController {
@@ -36,7 +37,7 @@ export class ClassController extends PrivateBaseController {
   }
 
   @Delete(":id")
-  async delete(@Param("id") id: string): Promise<ClassEntity> {
+  async delete(@Param("id") id: string): Promise<DeleteResult> {
     return this.service.delete(id);
   }
 }

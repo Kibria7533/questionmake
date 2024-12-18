@@ -14,6 +14,7 @@ import { SubjectModule } from "./modules/subject/subject.module";
 import { ClassModule } from "./modules/class/class.module";
 import { QuestionTypeModule } from "./modules/question-type/question-type.module";
 import { ChapterModule } from "./modules/chapter/chapter.module";
+import { PermissionManagerModule } from "./modules/permission/permission-manager.module";
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ChapterModule } from "./modules/chapter/chapter.module";
     SubjectModule,
     ChapterModule,
     QuestionTypeModule,
+    PermissionManagerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

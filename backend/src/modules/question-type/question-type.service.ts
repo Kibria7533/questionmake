@@ -4,6 +4,7 @@ import { CreateQuestionTypeDto } from "./dto/create-question-type.dto";
 import { Not } from "typeorm";
 import { QuestionTypeEntity } from "../../database/entities/question-type.entity";
 import { QuestionTypeRepository } from "../../database/repositories/question-type.repository";
+import { DeleteResult } from "typeorm/query-builder/result/DeleteResult";
 
 @Injectable()
 export class QuestionTypeService {
@@ -51,7 +52,7 @@ export class QuestionTypeService {
     return !!isExist;
   }
 
-  async delete(id: string): Promise<any> {
+  async delete(id: string): Promise<DeleteResult> {
     return this.repository.delete(id);
   }
 }

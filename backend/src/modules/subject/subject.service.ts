@@ -4,6 +4,7 @@ import { CreateSubjectDto } from "./dto/create-subject.dto";
 import { SubjectRepository } from "../../database/repositories/subject.repository";
 import { SubjectEntity } from "../../database/entities/subject.entity";
 import { Not } from "typeorm";
+import { DeleteResult } from "typeorm/query-builder/result/DeleteResult";
 
 @Injectable()
 export class SubjectService {
@@ -51,7 +52,7 @@ export class SubjectService {
     return !!isExist;
   }
 
-  async delete(id: string): Promise<any> {
+  async delete(id: string): Promise<DeleteResult> {
     return this.repository.delete(id);
   }
 }

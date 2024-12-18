@@ -3,6 +3,7 @@ import { CreateExamDto } from "./dto/create-exam.dto";
 import { ExamRepository } from "../../database/repositories/exam.repository";
 import { ExamEntity } from "../../database/entities/exam.entity";
 import { UpdateExamDto } from "./dto/update-exam.dto";
+import { DeleteResult } from "typeorm/query-builder/result/DeleteResult";
 
 @Injectable()
 export class ExamService {
@@ -32,7 +33,7 @@ export class ExamService {
     return this.repository.getOneById(id);
   }
 
-  async delete(id: number): Promise<any> {
+  async delete(id: number): Promise<DeleteResult> {
     return this.repository.delete(id);
   }
 }

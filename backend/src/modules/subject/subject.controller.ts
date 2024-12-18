@@ -5,6 +5,7 @@ import { UpdateSubjectDto } from "./dto/update-subject.dto";
 import { CreateSubjectDto } from "./dto/create-subject.dto";
 import { PrivateBaseController } from "../../guards/private.base.controller";
 import { SubjectEntity } from "../../database/entities/subject.entity";
+import { DeleteResult } from "typeorm/query-builder/result/DeleteResult";
 
 @Controller("subjects")
 export class SubjectController extends PrivateBaseController {
@@ -36,7 +37,7 @@ export class SubjectController extends PrivateBaseController {
   }
 
   @Delete(":id")
-  async delete(@Param("id") id: string): Promise<SubjectEntity> {
+  async delete(@Param("id") id: string): Promise<DeleteResult> {
     return this.service.delete(id);
   }
 }

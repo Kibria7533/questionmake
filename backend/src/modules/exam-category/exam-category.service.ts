@@ -3,6 +3,7 @@ import { UpdateExamCategoryDto } from "./dto/update-exam-category.dto";
 import { ExamCategoryEntity } from "../../database/entities/exam-category.entity";
 import { CreateExamCategoryDto } from "./dto/create-exam-category.dto";
 import { ExamCategoryRepository } from "../../database/repositories/exam-category.repository";
+import { DeleteResult } from "typeorm/query-builder/result/DeleteResult";
 
 @Injectable()
 export class ExamCategoryService {
@@ -50,7 +51,7 @@ export class ExamCategoryService {
     return !!isExist;
   }
 
-  async delete(id: string): Promise<any> {
+  async delete(id: string): Promise<DeleteResult> {
     return this.repository.delete(id);
   }
 }
