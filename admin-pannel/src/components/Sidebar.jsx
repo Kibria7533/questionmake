@@ -126,7 +126,7 @@ const Sidebar = () => {
           <Link href="/questionbank-explore" style={{ textDecoration: "none", color: "inherit" }}>
             <div style={styles.dropdownItem}>
               <FaSearch style={styles.icon} />
-              Explore Questions
+              Questions
             </div>
           </Link>
         </div>
