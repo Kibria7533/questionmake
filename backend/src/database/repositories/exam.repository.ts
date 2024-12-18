@@ -3,7 +3,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ExamEntity } from "../entities/exam.entity";
 import { ExamCategoryEntity } from "../entities/exam-category.entity";
-import { ObjectId } from "mongodb";
+
 
 @Injectable()
 export class ExamRepository extends Repository<ExamEntity> {
