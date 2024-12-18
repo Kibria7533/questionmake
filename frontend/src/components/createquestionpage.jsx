@@ -120,9 +120,7 @@ const CreateQuestion = () => {
       type: [],
       numberOfQuestions: "",
     });
-    document.querySelectorAll(".multi-select-container").forEach((dropdown) => {
-      dropdown.querySelectorAll("button").forEach((btn) => btn.click());
-    });
+   
   };
 
   const totalQuestions = requirements.reduce(

@@ -12,7 +12,6 @@
     "@heroicons/react": "^2.2.0",
     "@popperjs/core": "^2.11.8",
     "@szhsin/react-menu": "^4.2.3",
-    "bootstrap": "^5.3.3",
     "multiselect-react-dropdown": "^2.0.25",
     "next": "15.1.0",
     "react": "^19.0.0",
@@ -21,7 +20,9 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@typescript-eslint/parser": "^8.18.1",
     "eslint": "^9",
-    "eslint-config-next": "15.1.0"
+    "eslint-config-next": "^15.1.0",
+    "typescript": "^5.7.2"
   }
 }

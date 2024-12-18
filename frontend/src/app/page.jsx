@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
+
 import CertificationProviders from "@/components/certificationproviders";
 import Testimonials from "@/components/testimonials";
 import CounterSection from "@/components/countersection";
@@ -77,6 +77,7 @@ const Home = () => {
       color: "#bbb",
     },
   };
+
 
   return (
     <div style={styles.container}>

@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { FaSearch, FaUserCircle } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { useAuth } from "./AuthContext"; // Import AuthContext

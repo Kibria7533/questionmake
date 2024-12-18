@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
 import { FaQuoteLeft, FaQuoteRight } from "react-icons/fa";
 
 const Testimonials = () => {
