@@ -10,6 +10,10 @@ import { JwtModule } from "@nestjs/jwt";
 import { JWT_EXPIRE, JWT_SECRET } from "./config/constant";
 import { ExamCategoryModule } from "./modules/exam-category/exam-category.module";
 import { AuthModule } from "./modules/auth/auth.module";
+import { SubjectModule } from "./modules/subject/subject.module";
+import { ClassModule } from "./modules/class/class.module";
+import { QuestionTypeModule } from "./modules/question-type/question-type.module";
+import { ChapterModule } from "./modules/chapter/chapter.module";
 
 @Module({
   imports: [
@@ -23,6 +27,10 @@ import { AuthModule } from "./modules/auth/auth.module";
     UserModule,
     ExamCategoryModule,
     ExamModule,
+    ClassModule,
+    SubjectModule,
+    ChapterModule,
+    QuestionTypeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

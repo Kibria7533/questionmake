@@ -10,13 +10,15 @@ export class AuthenticationGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const requiredRoles: number[] = this.reflector.get<number[]>(PERMISSION_KEY, context.getHandler());
+    let requiredRoles: number[] = this.reflector.get<number[]>(PERMISSION_KEY, context.getHandler());
+    requiredRoles = requiredRoles?.length ? requiredRoles : [];
     const user: UserEntity = AuthUser.get();
 
     if (!user?.id) {
       throw new UnauthorizedException("Unauthenticated Action. Login Required!");
     }
 
+    // when private controller but no permission need
     if (requiredRoles?.length <= 0) {
       return true;
     }
