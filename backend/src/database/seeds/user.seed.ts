@@ -7,7 +7,7 @@ import { Role } from "../../config/enum";
 
 export class UserSeeder implements Seeder {
   async run(): Promise<any> {
-    const data: UserEntity[] = [
+    const data: any[] = [
       {
         id: 1,
         name: "admin",

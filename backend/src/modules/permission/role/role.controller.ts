@@ -7,6 +7,8 @@ import { CreateRoleDto } from "./dto/create-role.dto";
 import { UpdateRoleDto } from "./dto/update-role.dto";
 import { DeleteResult } from "typeorm/query-builder/result/DeleteResult";
 import { AssignPermissionsDto } from "./dto/assign-permissions.dto";
+import { HasPermission } from "../../../config/meta.data";
+import { Permissions } from "../../../config/permissions";
 
 @Controller("roles")
 export class RoleController extends PrivateBaseController {
@@ -34,6 +36,7 @@ export class RoleController extends PrivateBaseController {
     return this.service.assignPermissions(id, reqDto);
   }
 
+  @HasPermission([Permissions.GET_ROLE])
   @Get()
   async getAll(): Promise<RoleEntity[]> {
     return this.service.getAll();

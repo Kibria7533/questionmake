@@ -6,11 +6,16 @@ import * as bcrypt from "bcrypt";
 import { HASH_ROUND } from "../../config/constant";
 import { Role } from "../../config/enum";
 import { ChangeRoleDto } from "./dto/change-role.dto";
+import { RoleService } from "../permission/role/role.service";
+import { PermissionEntity } from "../../database/entities/permission.entity";
 
 @Injectable()
 export class UserService {
   @Inject()
   private readonly userRepository: UserRepository;
+
+  @Inject()
+  private readonly roleService: RoleService;
 
   async create(reqDto: CreateUserDto): Promise<UserEntity> {
     const isExist: UserEntity = await this.getOneByMobile(reqDto.mobile);
@@ -52,7 +57,14 @@ export class UserService {
   }
 
   async getAuthUser(sub: number): Promise<UserEntity> {
-    return this.userRepository.getAuthUser(sub);
+    const user: UserEntity = await this.userRepository.getAuthUser(sub);
+    if (user?.id) {
+      const permissions: PermissionEntity[] = await this.roleService.getPermissionsByRoleId(user.role);
+      user.permission_keys = permissions?.map((item: PermissionEntity) => {
+        return item.name;
+      });
+    }
+    return user;
   }
 
   async getOneByMobile(mobile: string): Promise<UserEntity> {

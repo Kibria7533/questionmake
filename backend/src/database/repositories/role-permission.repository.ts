@@ -15,6 +15,6 @@ export class RolePermissionRepository extends Repository<RolePermissionsEntity> 
       .select(["permission.id as id", "permission.name as name"])
       .where("role_permissions.role_id = :role_id", { role_id })
       .leftJoin("role_permissions.permission", "permission")
-      .getRawOne();
+      .getRawMany();
   }
 }

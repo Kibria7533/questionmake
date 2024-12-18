@@ -4,7 +4,7 @@ import { PermissionModuleEntity } from "../entities/permission-module.entity";
 
 export class PermissionModuleSeed implements Seeder {
   async run(): Promise<any> {
-    const data: PermissionModuleEntity[] = [
+    const data: any[] = [
       {
         id: 1,
         name: "USER",

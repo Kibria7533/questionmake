@@ -5,7 +5,7 @@ import { Permissions } from "../../config/permissions";
 
 export class PermissionSeed implements Seeder {
   async run(): Promise<any> {
-    const data: PermissionEntity[] = [
+    const data: any[] = [
       // USER
       {
         id: 1,

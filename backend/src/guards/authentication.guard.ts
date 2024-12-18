@@ -3,28 +3,31 @@ import { Reflector } from "@nestjs/core";
 import { AuthUser } from "../config/alc";
 import { PERMISSION_KEY } from "../config/meta.data";
 import { UserEntity } from "../database/entities/user.entity";
-import { isNumeric } from "../config/validations/is-number-string.validator";
 
 @Injectable()
 export class AuthenticationGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    let requiredRoles: number[] = this.reflector.get<number[]>(PERMISSION_KEY, context.getHandler());
-    requiredRoles = requiredRoles?.length ? requiredRoles : [];
+    let requirePermissions: string[] = this.reflector.get<string[]>(PERMISSION_KEY, context.getHandler());
+    requirePermissions = requirePermissions?.length ? requirePermissions : [];
     const user: UserEntity = AuthUser.get();
+
+    console.log(user);
 
     if (!user?.id) {
       throw new UnauthorizedException("Unauthenticated Action. Login Required!");
     }
 
     // when private controller but no permission need
-    if (requiredRoles?.length <= 0) {
+    if (requirePermissions?.length <= 0) {
       return true;
     }
 
-    const userRole: number = isNumeric(user.role) ? parseInt(String(user.role)) : user.role;
+    console.log(requirePermissions);
 
-    return requiredRoles.includes(userRole);
+    const userPermissions: string[] = user?.permission_keys ?? [];
+
+    return requirePermissions.some((permissionKey) => userPermissions.includes(permissionKey));
   }
 }

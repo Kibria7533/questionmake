@@ -8,6 +8,7 @@ import { DeleteResult } from "typeorm/query-builder/result/DeleteResult";
 import { AssignPermissionsDto } from "./dto/assign-permissions.dto";
 import { RolePermissionRepository } from "../../../database/repositories/role-permission.repository";
 import { RolePermissionsEntity } from "../../../database/entities/role-permissions.entity";
+import { PermissionEntity } from "../../../database/entities/permission.entity";
 
 @Injectable()
 export class RoleService {
@@ -70,8 +71,12 @@ export class RoleService {
 
   async getOneWithPermissions(id: number): Promise<RoleEntity> {
     const role: RoleEntity = await this.getOneByIdOrFail(id);
-    role.permissions = await this.rolePermissionRepository.getPermissionsByRoleId(id);
+    role.permissions = await this.getPermissionsByRoleId(id);
     return role;
+  }
+
+  async getPermissionsByRoleId(id: number): Promise<PermissionEntity[]> {
+    return (await this.rolePermissionRepository.getPermissionsByRoleId(id)) ?? [];
   }
 
   async getAll(): Promise<RoleEntity[]> {
