@@ -54,4 +54,9 @@ export class ExamCategoryService {
   async delete(id: string): Promise<DeleteResult> {
     return this.repository.delete(id);
   }
+  
+  async getAllCategoriesWithExams(): Promise<ExamCategoryEntity[]> {
+    return this.repository.getAllWithExams();
+  }
+  
 }
