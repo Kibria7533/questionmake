@@ -6,162 +6,162 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 const BASE_URL = "http://localhost:4000/api";
 
-const SubjectSettings = () => {
+const ChapterSettings = () => {
   const token = useSelector((state) => state.user.userData?.token); // Access token from Redux
-  const [subjects, setSubjects] = useState([]);
-  const [newSubject, setNewSubject] = useState("");
-  const [editSubject, setEditSubject] = useState(null);
+  const [chapters, setChapters] = useState([]);
+  const [newChapter, setNewChapter] = useState("");
+  const [editChapter, setEditChapter] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Fetch Subjects
-  const fetchSubjects = async () => {
+  // Fetch Chapters
+  const fetchChapters = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${BASE_URL}/subjects`, {
+      const response = await fetch(`${BASE_URL}/chapters`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       if (response.status === 401) {
         alert("You are not authorized to view this data.");
-        setSubjects([]);
+        setChapters([]);
         return;
       }
       const data = await response.json();
-      setSubjects(Array.isArray(data) ? data : []);
+      setChapters(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error("Failed to fetch subjects:", error);
+      console.error("Failed to fetch chapters:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Add Subject
-  const handleAddSubject = async () => {
-    if (!newSubject.trim()) {
-      alert("Subject name cannot be empty.");
+  // Add Chapter
+  const handleAddChapter = async () => {
+    if (!newChapter.trim()) {
+      alert("Chapter name cannot be empty.");
       return;
     }
 
     try {
-      const response = await fetch(`${BASE_URL}/subjects`, {
+      const response = await fetch(`${BASE_URL}/chapters`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name: newSubject.trim() }),
+        body: JSON.stringify({ name: newChapter.trim() }),
       });
       if (response.status === 401) {
-        alert("You are not authorized to add subjects.");
+        alert("You are not authorized to add chapters.");
         return;
       }
       const data = await response.json();
-      setSubjects([...subjects, data]);
-      setNewSubject("");
+      setChapters([...chapters, data]);
+      setNewChapter("");
     } catch (error) {
-      console.error("Failed to add subject:", error);
+      console.error("Failed to add chapter:", error);
     }
   };
 
-  // Delete Subject
-  const handleDeleteSubject = async (id) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this subject?");
+  // Delete Chapter
+  const handleDeleteChapter = async (id) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this chapter?");
     if (!confirmDelete) return;
 
     try {
-      const response = await fetch(`${BASE_URL}/subjects/${id}`, {
+      const response = await fetch(`${BASE_URL}/chapters/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       if (response.status === 401) {
-        alert("You are not authorized to delete subjects.");
+        alert("You are not authorized to delete chapters.");
         return;
       }
-      setSubjects(subjects.filter((sub) => sub.id !== id));
+      setChapters(chapters.filter((ch) => ch.id !== id));
     } catch (error) {
-      console.error("Failed to delete subject:", error);
+      console.error("Failed to delete chapter:", error);
     }
   };
 
-  // Update Subject
-  const handleUpdateSubject = async () => {
-    if (!editSubject.name.trim()) {
-      alert("Subject name cannot be empty.");
+  // Update Chapter
+  const handleUpdateChapter = async () => {
+    if (!editChapter.name.trim()) {
+      alert("Chapter name cannot be empty.");
       return;
     }
 
     try {
-      const response = await fetch(`${BASE_URL}/subjects/${editSubject.id}`, {
+      const response = await fetch(`${BASE_URL}/chapters/${editChapter.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name: editSubject.name.trim() }),
+        body: JSON.stringify({ name: editChapter.name.trim() }),
       });
       if (response.status === 401) {
-        alert("You are not authorized to update subjects.");
+        alert("You are not authorized to update chapters.");
         return;
       }
-      const updatedSubject = await response.json();
-      setSubjects(subjects.map((sub) => (sub.id === updatedSubject.id ? updatedSubject : sub)));
-      setEditSubject(null);
+      const updatedChapter = await response.json();
+      setChapters(chapters.map((ch) => (ch.id === updatedChapter.id ? updatedChapter : ch)));
+      setEditChapter(null);
     } catch (error) {
-      console.error("Failed to update subject:", error);
+      console.error("Failed to update chapter:", error);
     }
   };
 
   useEffect(() => {
-    fetchSubjects();
+    fetchChapters();
   }, []);
 
   return (
     <div>
-      <h3 className="text-secondary">Subject Settings</h3>
+      <h3 className="text-secondary">Chapter Settings</h3>
 
-      {/* Add Subject */}
+      {/* Add Chapter */}
       <div className="mb-3 d-flex">
         <input
           type="text"
           className="form-control me-2"
-          placeholder="Add new subject"
-          value={newSubject}
-          onChange={(e) => setNewSubject(e.target.value)}
+          placeholder="Add new chapter"
+          value={newChapter}
+          onChange={(e) => setNewChapter(e.target.value)}
         />
-        <button className="btn btn-success" onClick={handleAddSubject}>
+        <button className="btn btn-success" onClick={handleAddChapter}>
           Add
         </button>
       </div>
 
       {loading ? (
-        <p>Loading subjects...</p>
+        <p>Loading chapters...</p>
       ) : (
         <>
-          {subjects.length > 0 ? (
+          {chapters.length > 0 ? (
             <table className="table table-bordered">
               <thead className="bg-primary text-white">
                 <tr>
-                  <th>Subject Name</th>
+                  <th>Chapter Name</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {subjects.map((sub) => (
-                  <tr key={sub.id}>
-                    <td>{sub.name}</td>
+                {chapters.map((ch) => (
+                  <tr key={ch.id}>
+                    <td>{ch.name}</td>
                     <td>
                       <button
                         className="btn btn-warning me-2"
-                        onClick={() => setEditSubject(sub)}
+                        onClick={() => setEditChapter(ch)}
                       >
                         Edit
                       </button>
                       <button
                         className="btn btn-danger"
-                        onClick={() => handleDeleteSubject(sub.id)}
+                        onClick={() => handleDeleteChapter(ch.id)}
                       >
                         Delete
                       </button>
@@ -171,13 +171,13 @@ const SubjectSettings = () => {
               </tbody>
             </table>
           ) : (
-            <p>No subjects available or unauthorized to view subjects.</p>
+            <p>No chapters available or unauthorized to view chapters.</p>
           )}
         </>
       )}
 
       {/* Edit Modal */}
-      {editSubject && (
+      {editChapter && (
         <div
           className="modal show d-block"
           tabIndex="-1"
@@ -186,22 +186,22 @@ const SubjectSettings = () => {
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Edit Subject</h5>
-                <button className="btn-close" onClick={() => setEditSubject(null)}></button>
+                <h5 className="modal-title">Edit Chapter</h5>
+                <button className="btn-close" onClick={() => setEditChapter(null)}></button>
               </div>
               <div className="modal-body">
                 <input
                   type="text"
                   className="form-control"
-                  value={editSubject.name}
-                  onChange={(e) => setEditSubject({ ...editSubject, name: e.target.value })}
+                  value={editChapter.name}
+                  onChange={(e) => setEditChapter({ ...editChapter, name: e.target.value })}
                 />
               </div>
               <div className="modal-footer">
-                <button className="btn btn-primary" onClick={handleUpdateSubject}>
+                <button className="btn btn-primary" onClick={handleUpdateChapter}>
                   Save
                 </button>
-                <button className="btn btn-secondary" onClick={() => setEditSubject(null)}>
+                <button className="btn btn-secondary" onClick={() => setEditChapter(null)}>
                   Cancel
                 </button>
               </div>
@@ -213,4 +213,4 @@ const SubjectSettings = () => {
   );
 };
 
-export default SubjectSettings;
+export default ChapterSettings;

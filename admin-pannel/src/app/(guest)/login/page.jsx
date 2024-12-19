@@ -2,9 +2,12 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { login } from "../../../redux/store";
 
 const Login = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({ mobile: "", password: "" });
   const [loading, setLoading] = useState(false);
 
@@ -32,10 +35,12 @@ const Login = () => {
       if (response.ok) {
         // Store the access token in localStorage
         localStorage.setItem("access_token", data.access_token);
-        router.push("/"); // Redirect to the profile page
-        // setTimeout(() => {
-        //   window.location.reload();
-        // }, 50); // Small delay to ensure navigation happens first
+
+        // Dispatch the token to Redux store
+        dispatch(login({ token: data.access_token }));
+
+        // Redirect to the home page
+        router.push("/");
       } else {
         throw new Error(data.message || "Login failed. Please try again.");
       }
@@ -161,7 +166,6 @@ const Login = () => {
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
-
       </div>
     </div>
   );

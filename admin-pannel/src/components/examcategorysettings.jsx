@@ -2,90 +2,41 @@
 
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-
-const BASE_URL = "http://localhost:4000/api";
+import { useSelector, useDispatch } from "react-redux";
+import {fetchExamCategories,addExamCategory,updateExamCategory,deleteExamCategory} from "../redux/examCategorySlice";
 
 const ExamCategorySettings = () => {
-  const [examCategories, setExamCategories] = useState([]);
+  const dispatch = useDispatch();
+  const { categories, loading } = useSelector((state) => state.examCategory);
+
   const [newCategory, setNewCategory] = useState("");
   const [editCategory, setEditCategory] = useState(null);
   const [viewCategory, setViewCategory] = useState(null);
 
-  // Fetch Exam Categories
-  const fetchExamCategories = async () => {
-    try {
-      const response = await fetch(`${BASE_URL}/exam-category`);
-      const data = await response.json();
-      setExamCategories(data);
-    } catch (error) {
-      console.error("Failed to fetch exam categories:", error);
-    }
-  };
-
-  // Add Exam Category
-  const handleAddExamCategory = async () => {
-    if (!newCategory) return alert("Category name cannot be empty.");
-    try {
-      const response = await fetch(`${BASE_URL}/exam-category`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newCategory }),
-      });
-      const data = await response.json();
-      setExamCategories([...examCategories, data]);
-      setNewCategory("");
-    } catch (error) {
-      console.error("Failed to add exam category:", error);
-    }
-  };
-
-  // Delete Exam Category
-  const handleDeleteExamCategory = async (id) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this category?");
-    if (!confirmDelete) return;
-    try {
-      await fetch(`${BASE_URL}/exam-category/${id}`, { method: "DELETE" });
-      setExamCategories(examCategories.filter((category) => category.id !== id));
-    } catch (error) {
-      console.error("Failed to delete exam category:", error);
-    }
-  };
-
-  // Update Exam Category
-  const handleUpdateExamCategory = async () => {
-    if (!editCategory.name) return alert("Category name cannot be empty.");
-    try {
-      const response = await fetch(`${BASE_URL}/exam-category/${editCategory.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: editCategory.name }),
-      });
-      const updatedCategory = await response.json();
-      setExamCategories(
-        examCategories.map((category) =>
-          category.id === updatedCategory.id ? updatedCategory : category
-        )
-      );
-      setEditCategory(null);
-    } catch (error) {
-      console.error("Failed to update exam category:", error);
-    }
-  };
-
-  // Fetch View Exam Category
-  const handleViewExamCategory = async (id) => {
-    try {
-      const response = await fetch(`${BASE_URL}/exam-category/${id}`);
-      const data = await response.json();
-      setViewCategory(data);
-    } catch (error) {
-      console.error("Failed to view exam category:", error);
-    }
-  };
-
   useEffect(() => {
-    fetchExamCategories();
-  }, []);
+    dispatch(fetchExamCategories());
+  }, [dispatch]);
+
+  const handleAddExamCategory = () => {
+    if (!newCategory) return alert("Category name cannot be empty.");
+    dispatch(addExamCategory(newCategory));
+    setNewCategory("");
+  };
+
+  const handleUpdateExamCategory = () => {
+    if (!editCategory.name) return alert("Category name cannot be empty.");
+    dispatch(updateExamCategory(editCategory));
+    setEditCategory(null);
+  };
+
+  const handleDeleteExamCategory = (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this category?"
+    );
+    if (confirmDelete) {
+      dispatch(deleteExamCategory(id));
+    }
+  };
 
   return (
     <div>
@@ -106,41 +57,45 @@ const ExamCategorySettings = () => {
         </div>
       </div>
 
-      <table className="table table-bordered">
-        <thead className="bg-primary text-white">
-          <tr>
-            <th>Category Name</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {examCategories.map((category) => (
-            <tr key={category.id}>
-              <td>{category.name}</td>
-              <td>
-                <button
-                  className="btn btn-info me-2"
-                  onClick={() => handleViewExamCategory(category.id)}
-                >
-                  View
-                </button>
-                <button
-                  className="btn btn-warning me-2"
-                  onClick={() => setEditCategory(category)}
-                >
-                  Edit
-                </button>
-                <button
-                  className="btn btn-danger"
-                  onClick={() => handleDeleteExamCategory(category.id)}
-                >
-                  Delete
-                </button>
-              </td>
+      {loading ? (
+        <p>Loading categories...</p>
+      ) : (
+        <table className="table table-bordered">
+          <thead className="bg-primary text-white">
+            <tr>
+              <th>Category Name</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {categories.map((category) => (
+              <tr key={category.id}>
+                <td>{category.name}</td>
+                <td>
+                  <button
+                    className="btn btn-info me-2"
+                    onClick={() => setViewCategory(category)}
+                  >
+                    View
+                  </button>
+                  <button
+                    className="btn btn-warning me-2"
+                    onClick={() => setEditCategory(category)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => handleDeleteExamCategory(category.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
 
       {/* View Modal */}
       {viewCategory && (

@@ -1,15 +1,19 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import Link from "next/link"; // Import Link from next/link
+import React, { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-
-const BASE_URL = "http://localhost:4000/api";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../redux/store";
+import { FaUserCircle } from "react-icons/fa"; // Importing a user icon
 
 const Header = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
+  const dispatch = useDispatch();
+
+  // Access Redux state
+  const isLoggedIn = useSelector((state) => state.user.isAuthenticated);
   const [showDropdown, setShowDropdown] = useState(false);
-  const router = useRouter(); // Use router for logout redirection
 
   const styles = {
     header: {
@@ -26,30 +30,22 @@ const Header = () => {
       position: "relative",
       display: "flex",
       alignItems: "center",
-      gap: "15px",
+      gap: "10px",
       color: "white",
       cursor: "pointer",
     },
     profileIcon: {
-      width: "30px",
-      height: "30px",
-      borderRadius: "50%",
-      backgroundColor: "#fff",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      color: "#004080",
-      fontWeight: "bold",
-      fontSize: "1rem",
+      fontSize: "2rem", // Adjust icon size
+      color: "white",
     },
     dropdown: {
       position: "absolute",
       top: "50px",
       right: "0",
       backgroundColor: "white",
-      boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
-      borderRadius: "5px",
-      width: "150px",
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+      borderRadius: "8px",
+      width: "200px",
       zIndex: "1000",
       display: "flex",
       flexDirection: "column",
@@ -61,6 +57,7 @@ const Header = () => {
       cursor: "pointer",
       borderBottom: "1px solid #ddd",
       textDecoration: "none",
+      fontSize: "1rem",
     },
     dropdownItemLast: {
       padding: "10px",
@@ -79,19 +76,17 @@ const Header = () => {
     },
   };
 
-  useEffect(() => {
-    // Check for access_token in localStorage
-    const token = localStorage.getItem("access_token");
-    if (token) {
-      setIsLoggedIn(true);
-    }
-  }, []);
-
   const handleLogout = () => {
-    localStorage.removeItem("access_token"); // Remove token from localStorage
-    setIsLoggedIn(false);
-    router.push("/login"); // Redirect to login page
+    // Remove token from localStorage
+    localStorage.removeItem("access_token");
+    
+    // Dispatch logout action to update Redux state
+    dispatch(logout());
+  
+    // Redirect to the login page
+    router.push("/login");
   };
+  
 
   return (
     <header style={styles.header}>
@@ -101,7 +96,7 @@ const Header = () => {
           style={styles.profileContainer}
           onClick={() => setShowDropdown(!showDropdown)}
         >
-          <div style={styles.profileIcon}>P</div>
+          <FaUserCircle style={styles.profileIcon} /> {/* Using React Icon */}
           {showDropdown && (
             <div style={styles.dropdown}>
               <Link href="/profile" style={styles.dropdownItem}>

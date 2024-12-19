@@ -2,99 +2,60 @@
 
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-
-const BASE_URL = "http://localhost:4000/api";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchExamCategories } from "../redux/examCategorySlice";
+import { fetchExams, addExam, updateExam, deleteExam } from "../redux/examSlice";
 
 const ExamSettings = () => {
-  const [exams, setExams] = useState([]);
-  const [examCategories, setExamCategories] = useState([]);
+  const dispatch = useDispatch();
+
+  // Access Redux state
+  const examCategories = useSelector((state) => state.examCategory.categories);
+  const exams = useSelector((state) => state.exam.exams);
+  const loading = useSelector((state) => state.exam.loading);
+
   const [newExam, setNewExam] = useState({ name: "", categoryId: "" });
   const [editExam, setEditExam] = useState(null);
 
-  // Fetch Exam Categories
-  const fetchExamCategories = async () => {
-    try {
-      const response = await fetch(`${BASE_URL}/exam-category`);
-      const data = await response.json();
-      setExamCategories(data);
-    } catch (error) {
-      console.error("Failed to fetch exam categories:", error);
-    }
-  };
+  useEffect(() => {
+    // Fetch categories and exams from Redux store
+    dispatch(fetchExamCategories());
+    dispatch(fetchExams());
+  }, [dispatch]);
 
-  // Fetch Exams
-  const fetchExams = async () => {
-    try {
-      const response = await fetch(`${BASE_URL}/exam`);
-      const data = await response.json();
-      setExams(data);
-    } catch (error) {
-      console.error("Failed to fetch exams:", error);
-    }
-  };
-
-  // Add Exam
-  const handleAddExam = async () => {
+  const handleAddExam = () => {
     if (!newExam.name || !newExam.categoryId) {
       return alert("Please provide both exam name and category.");
     }
-    try {
-      const response = await fetch(`${BASE_URL}/exam`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: newExam.name,
-          exam_category_id: Number(newExam.categoryId),
-        }),
-      });
-      const data = await response.json();
-      setExams([...exams, data]);
-      setNewExam({ name: "", categoryId: "" });
-    } catch (error) {
-      console.error("Failed to add exam:", error);
-    }
+    dispatch(
+      addExam({
+        name: newExam.name,
+        exam_category_id: Number(newExam.categoryId),
+      })
+    );
+    setNewExam({ name: "", categoryId: "" });
   };
 
-  // Delete Exam
-  const handleDeleteExam = async (id) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this exam?");
-    if (!confirmDelete) return;
-    try {
-      await fetch(`${BASE_URL}/exam/${id}`, { method: "DELETE" });
-      setExams(exams.filter((exam) => exam.id !== id));
-    } catch (error) {
-      console.error("Failed to delete exam:", error);
-    }
-  };
-
-  // Update Exam
-  const handleUpdateExam = async () => {
+  const handleUpdateExam = () => {
     if (!editExam.name || !editExam.categoryId) {
       return alert("Please provide both exam name and category.");
     }
-    try {
-      const response = await fetch(`${BASE_URL}/exam/${editExam.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: editExam.name,
-          exam_category_id: Number(editExam.categoryId),
-        }),
-      });
-      const updatedExam = await response.json();
-      setExams(
-        exams.map((exam) => (exam.id === updatedExam.id ? updatedExam : exam))
-      );
-      setEditExam(null);
-    } catch (error) {
-      console.error("Failed to update exam:", error);
-    }
+    dispatch(
+      updateExam({
+        id: editExam.id,
+        name: editExam.name,
+        exam_category_id: Number(editExam.categoryId),
+      })
+    );
+    setEditExam(null);
   };
 
-  useEffect(() => {
-    fetchExamCategories();
-    fetchExams();
-  }, []);
+  const handleDeleteExam = (id) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this exam?");
+    if (confirmDelete) {
+      dispatch(deleteExam(id));
+    }
+  };
 
   return (
     <div>
@@ -127,42 +88,46 @@ const ExamSettings = () => {
       </div>
 
       {/* Exam List */}
-      <table className="table table-bordered">
-        <thead className="bg-primary text-white">
-          <tr>
-            <th>Exam Name</th>
-            <th>Category</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {exams.map((exam) => (
-            <tr key={exam.id}>
-              <td>{exam.name}</td>
-              <td>
-                {
-                  examCategories.find((category) => category.id === exam.exam_category_id)
-                    ?.name || "Unknown"
-                }
-              </td>
-              <td>
-                <button
-                  className="btn btn-warning me-2"
-                  onClick={() => setEditExam({ ...exam, categoryId: exam.exam_category_id })}
-                >
-                  Edit
-                </button>
-                <button
-                  className="btn btn-danger"
-                  onClick={() => handleDeleteExam(exam.id)}
-                >
-                  Delete
-                </button>
-              </td>
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <table className="table table-bordered">
+          <thead className="bg-primary text-white">
+            <tr>
+              <th>Exam Name</th>
+              <th>Category</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {exams.map((exam) => (
+              <tr key={exam.id}>
+                <td>{exam.name}</td>
+                <td>
+                  {
+                    examCategories.find((category) => category.id === exam.exam_category_id)
+                      ?.name || "Unknown"
+                  }
+                </td>
+                <td>
+                  <button
+                    className="btn btn-warning me-2"
+                    onClick={() => setEditExam({ ...exam, categoryId: exam.exam_category_id })}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => handleDeleteExam(exam.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
 
       {/* Edit Modal */}
       {editExam && (

@@ -6,6 +6,8 @@ import ClassSettings from "./classsettings"; // Adjust file path if necessary
 import SubjectSettings from "./subjectsettings"; // Adjust file path if necessary
 import ExamCategorySettings from "./examcategorysettings"; // Adjust file path if necessary
 import ExamSettings from "./examsettings";
+import ChapterSettings from "./chaptersettings";
+import QuestionTypeSettings from "./questiontypesettings";
 
 const Settings = () => {
   return (
@@ -20,6 +22,15 @@ const Settings = () => {
       {/* Subject Settings Section */}
       <div className="mb-5">
         <SubjectSettings />
+      </div>
+      {/* Chapter Settings Section */}
+      <div className="mb-5">
+        <ChapterSettings/>
+      </div>
+
+      {/* Question Type Settings Section */}
+      <div className="mb-5">
+        <QuestionTypeSettings/>
       </div>
 
       {/* Exam Category Settings Section */}
