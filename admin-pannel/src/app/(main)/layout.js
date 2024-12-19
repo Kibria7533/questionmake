@@ -5,7 +5,6 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import store from "../../redux/store";
 import { login, logout } from "../../redux/store";
 import { Provider, useDispatch } from "react-redux";
 // Root Layout with Sidebar and Header
@@ -32,14 +31,19 @@ export default function RootLayout({ children }) {
 
   const dispatch = useDispatch();
   const router = useRouter();
-  useEffect(() => {
-    const token = localStorage.getItem("access_token");
+
+  const setToken= async ()=>{
+    const token =await localStorage.getItem("access_token");
     if (token) {
       // Simulate user data fetch or token validation
       dispatch(login({ token }));
     } else {
       router.push("/login");
     }
+  }
+  useEffect(() => {
+    setToken();
+
   }, [dispatch, router]);
 
 

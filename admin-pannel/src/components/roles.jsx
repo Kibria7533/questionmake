@@ -1,8 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+
+const BASE_URL = "http://localhost:4000/api";
 
 const Roles = () => {
+  const token = useSelector((state) => state.user.userData?.token); // Access token from Redux
   const [roles, setRoles] = useState([]);
   const [roleName, setRoleName] = useState("");
   const [editingRoleId, setEditingRoleId] = useState(null);
@@ -10,24 +14,70 @@ const Roles = () => {
   const [userId, setUserId] = useState("");
   const [userRoleId, setUserRoleId] = useState("");
 
-  // Fetch roles (dummy data for now)
-  useEffect(() => {
-    // Replace with API call to fetch roles
-    setRoles([
-      { id: 1, name: "Admin" },
-      { id: 2, name: "Editor" },
-      { id: 3, name: "Viewer" },
-    ]);
-  }, []);
+  const [permissions, setPermissions] = useState([]);
+  const [selectedRolePermissions, setSelectedRolePermissions] = useState([]);
+
+  // Fetch roles
+  const fetchRoles = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/roles`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setRoles(data);
+      } else {
+        alert("Failed to fetch roles.");
+      }
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
+  };
+
+  // Fetch permissions for a role
+  const fetchPermissions = async (roleId) => {
+    try {
+      const response = await fetch(`${BASE_URL}/roles/${roleId}/permissions`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSelectedRolePermissions(data);
+      } else {
+        alert("Failed to fetch permissions.");
+      }
+    } catch (error) {
+      console.error("Error fetching permissions:", error);
+    }
+  };
 
   // Add a new role
-  const handleAddRole = () => {
+  const handleAddRole = async () => {
     if (!roleName) return alert("Role name is required");
 
-    // Replace with API call to add role
-    const newRole = { id: Date.now(), name: roleName };
-    setRoles([...roles, newRole]);
-    setRoleName("");
+    try {
+      const response = await fetch(`${BASE_URL}/roles`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: roleName }),
+      });
+      if (response.ok) {
+        const newRole = await response.json();
+        setRoles([...roles, newRole]);
+        setRoleName("");
+      } else {
+        alert("Failed to add role.");
+      }
+    } catch (error) {
+      console.error("Error adding role:", error);
+    }
   };
 
   // Edit an existing role
@@ -36,36 +86,84 @@ const Roles = () => {
     setEditingRoleName(name);
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (!editingRoleName) return alert("Role name is required");
 
-    // Replace with API call to update role
-    setRoles(
-      roles.map((role) =>
-        role.id === editingRoleId ? { ...role, name: editingRoleName } : role
-      )
-    );
-    setEditingRoleId(null);
-    setEditingRoleName("");
+    try {
+      const response = await fetch(`${BASE_URL}/roles/${editingRoleId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: editingRoleName }),
+      });
+      if (response.ok) {
+        const updatedRole = await response.json();
+        setRoles(
+          roles.map((role) =>
+            role.id === editingRoleId ? { ...role, name: updatedRole.name } : role
+          )
+        );
+        setEditingRoleId(null);
+        setEditingRoleName("");
+      } else {
+        alert("Failed to update role.");
+      }
+    } catch (error) {
+      console.error("Error updating role:", error);
+    }
   };
 
   // Delete a role
-  const handleDeleteRole = (id) => {
+  const handleDeleteRole = async (id) => {
     if (!window.confirm("Are you sure you want to delete this role?")) return;
 
-    // Replace with API call to delete role
-    setRoles(roles.filter((role) => role.id !== id));
+    try {
+      const response = await fetch(`${BASE_URL}/roles/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        setRoles(roles.filter((role) => role.id !== id));
+      } else {
+        alert("Failed to delete role.");
+      }
+    } catch (error) {
+      console.error("Error deleting role:", error);
+    }
   };
 
   // Assign role to user
-  const handleAssignRole = () => {
+  const handleAssignRole = async () => {
     if (!userId || !userRoleId) return alert("Both User ID and Role ID are required");
 
-    // Replace with API call to assign role
-    alert(`Assigned role ID ${userRoleId} to user ID ${userId}`);
-    setUserId("");
-    setUserRoleId("");
+    try {
+      const response = await fetch(`${BASE_URL}/roles/${userRoleId}/assign-permissions`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ userId }),
+      });
+      if (response.ok) {
+        alert("Role assigned successfully.");
+        setUserId("");
+        setUserRoleId("");
+      } else {
+        alert("Failed to assign role.");
+      }
+    } catch (error) {
+      console.error("Error assigning role:", error);
+    }
   };
+
+  useEffect(() => {
+    fetchRoles();
+  }, []);
 
   const styles = {
     container: {
@@ -216,11 +314,29 @@ const Roles = () => {
                 >
                   Delete
                 </button>
+                <button
+                  style={{ ...styles.button, marginLeft: "10px" }}
+                  onClick={() => fetchPermissions(role.id)}
+                >
+                  View Permissions
+                </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {/* Display Permissions */}
+      {selectedRolePermissions.length > 0 && (
+        <div>
+          <h3>Permissions for Selected Role:</h3>
+          <ul>
+            {selectedRolePermissions.map((perm) => (
+              <li key={perm.id}>{perm.name}</li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };

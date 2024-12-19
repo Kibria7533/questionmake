@@ -7,7 +7,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 const BASE_URL = "http://localhost:4000/api";
 
 const QuestionTypeSettings = () => {
-  const token = useSelector((state) => state.user.userData?.token); // Access token from Redux
+  const token = localStorage.getItem("access_token"); // Access token from Redux
   const [questionTypes, setQuestionTypes] = useState([]);
   const [newQuestionType, setNewQuestionType] = useState("");
   const [editQuestionType, setEditQuestionType] = useState(null);

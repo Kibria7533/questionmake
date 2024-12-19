@@ -1,62 +1,96 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+
+const BASE_URL = "http://localhost:4000/api";
 
 const Permissions = () => {
+  const token = localStorage.getItem("access_token"); // Access token from Redux
   const [permissions, setPermissions] = useState([]);
-  const [permissionKey, setPermissionKey] = useState("");
+  const [groupedPermissions, setGroupedPermissions] = useState({});
   const [roles, setRoles] = useState([]);
   const [selectedRoleId, setSelectedRoleId] = useState("");
-  const [selectedPermissionKey, setSelectedPermissionKey] = useState("");
+  const [selectedPermissionId, setSelectedPermissionId] = useState("");
 
-  // Fetch permissions and roles (dummy data for now)
-  useEffect(() => {
-    // Replace with API call to fetch permissions
-    setPermissions([
-      { id: 1, key: "view_dashboard" },
-      { id: 2, key: "edit_users" },
-      { id: 3, key: "manage_roles" },
-    ]);
+  // Fetch permissions
+  const fetchPermissions = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/permissions`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
 
-    // Replace with API call to fetch roles
-    setRoles([
-      { id: 1, name: "Admin" },
-      { id: 2, name: "Editor" },
-      { id: 3, name: "Viewer" },
-    ]);
-  }, []);
+        // Group permissions by module_id
+        const grouped = data.reduce((acc, perm) => {
+          if (!acc[perm.module_id]) acc[perm.module_id] = [];
+          acc[perm.module_id].push(perm);
+          return acc;
+        }, {});
+        setPermissions(data);
+        setGroupedPermissions(grouped);
+      } else {
+        alert("Failed to fetch permissions.");
+      }
+    } catch (error) {
+      console.error("Error fetching permissions:", error);
+    }
+  };
 
-  // Add a new permission
-  const handleAddPermission = () => {
-    if (!permissionKey) return alert("Permission key is required");
-
-    // Replace with API call to add permission
-    const newPermission = { id: Date.now(), key: permissionKey };
-    setPermissions([...permissions, newPermission]);
-    setPermissionKey("");
+  // Fetch roles
+  const fetchRoles = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/roles`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setRoles(data);
+      } else {
+        alert("Failed to fetch roles.");
+      }
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
   };
 
   // Assign permission to role
-  const handleAssignPermission = () => {
-    if (!selectedRoleId || !selectedPermissionKey)
-      return alert("Both Role ID and Permission Key are required");
+  const handleAssignPermission = async () => {
+    if (!selectedRoleId || !selectedPermissionId) {
+      return alert("Both Role ID and Permission ID are required");
+    }
 
-    // Replace with API call to assign permission
-    alert(
-      `Assigned permission "${selectedPermissionKey}" to role ID ${selectedRoleId}`
-    );
-    setSelectedRoleId("");
-    setSelectedPermissionKey("");
+    try {
+      const response = await fetch(`${BASE_URL}/roles/${selectedRoleId}/assign-permissions`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ permissionId: selectedPermissionId }),
+      });
+
+      if (response.ok) {
+        alert(`Permission ID "${selectedPermissionId}" assigned to role ID ${selectedRoleId}`);
+        setSelectedRoleId("");
+        setSelectedPermissionId("");
+      } else {
+        alert("Failed to assign permission.");
+      }
+    } catch (error) {
+      console.error("Error assigning permission:", error);
+    }
   };
 
-  // Delete a permission
-  const handleDeletePermission = (id) => {
-    if (!window.confirm("Are you sure you want to delete this permission?"))
-      return;
-
-    // Replace with API call to delete permission
-    setPermissions(permissions.filter((perm) => perm.id !== id));
-  };
+  useEffect(() => {
+    fetchPermissions();
+    fetchRoles();
+  }, []);
 
   const styles = {
     container: {
@@ -90,9 +124,6 @@ const Permissions = () => {
       color: "white",
       transition: "background-color 0.3s",
     },
-    buttonDanger: {
-      backgroundColor: "#d9534f",
-    },
     table: {
       width: "100%",
       borderCollapse: "collapse",
@@ -108,31 +139,11 @@ const Permissions = () => {
       border: "1px solid #ccc",
       padding: "10px",
     },
-    rowEven: {
-      backgroundColor: "#f9f9f9",
-    },
-    rowOdd: {
-      backgroundColor: "#fff",
-    },
   };
 
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>Permissions Management</h1>
-
-      {/* Add Permission Form */}
-      <div style={styles.form}>
-        <input
-          type="text"
-          placeholder="Enter permission key"
-          value={permissionKey}
-          onChange={(e) => setPermissionKey(e.target.value)}
-          style={styles.input}
-        />
-        <button style={styles.button} onClick={handleAddPermission}>
-          Add Permission
-        </button>
-      </div>
 
       {/* Assign Permission to Role */}
       <div style={styles.form}>
@@ -149,14 +160,14 @@ const Permissions = () => {
           ))}
         </select>
         <select
-          value={selectedPermissionKey}
-          onChange={(e) => setSelectedPermissionKey(e.target.value)}
+          value={selectedPermissionId}
+          onChange={(e) => setSelectedPermissionId(e.target.value)}
           style={styles.input}
         >
           <option value="">Select Permission</option>
           {permissions.map((perm) => (
-            <option key={perm.id} value={perm.key}>
-              {perm.key}
+            <option key={perm.id} value={perm.id}>
+              {perm.name}
             </option>
           ))}
         </select>
@@ -166,38 +177,36 @@ const Permissions = () => {
       </div>
 
       {/* Permissions Table */}
-      <table style={styles.table}>
-        <thead>
-          <tr>
-            <th style={styles.th}>ID</th>
-            <th style={styles.th}>Key</th>
-            <th style={styles.th}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {permissions.map((perm, index) => (
-            <tr
-              key={perm.id}
-              style={index % 2 === 0 ? styles.rowEven : styles.rowOdd}
-            >
-              <td style={styles.td}>{perm.id}</td>
-              <td style={styles.td}>{perm.key}</td>
-              <td style={styles.td}>
-                <button
-                  style={{
-                    ...styles.button,
-                    ...styles.buttonDanger,
-                    marginLeft: "10px",
-                  }}
-                  onClick={() => handleDeletePermission(perm.id)}
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {Object.keys(groupedPermissions).map((moduleId) => (
+        <div key={moduleId}>
+          <h3>Module ID: {moduleId}</h3>
+          <table style={styles.table}>
+            <thead>
+              <tr>
+                <th style={styles.th}>ID</th>
+                <th style={styles.th}>Permission Name</th>
+                <th style={styles.th}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {groupedPermissions[moduleId].map((perm) => (
+                <tr key={perm.id}>
+                  <td style={styles.td}>{perm.id}</td>
+                  <td style={styles.td}>{perm.name}</td>
+                  <td style={styles.td}>
+                    <button
+                      style={{ ...styles.button, backgroundColor: "#d9534f" }}
+                      onClick={() => alert("Delete functionality can be added here.")}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ))}
     </div>
   );
 };

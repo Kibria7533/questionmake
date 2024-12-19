@@ -7,7 +7,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 const BASE_URL = "http://localhost:4000/api";
 
 const ClassSettings = () => {
-  const token = useSelector((state) => state.user.userData?.token); // Access token from userData
+  const token = localStorage.getItem("access_token"); // Access token from userData
   const [classes, setClasses] = useState([]);
   const [newClass, setNewClass] = useState("");
   const [editClass, setEditClass] = useState(null);

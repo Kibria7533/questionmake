@@ -1,34 +1,81 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-const Users = () => {
-  const [users, setUsers] = useState([
-    { id: 1, name: "Alice", email: "alice@example.com", role: "Admin" },
-    { id: 2, name: "Bob", email: "bob@example.com", role: "Editor" },
-    { id: 3, name: "Charlie", email: "charlie@example.com", role: "Viewer" },
-  ]);
+const BASE_URL = "http://localhost:4000/api";
 
+const Users = () => {
+  const token = useSelector((state) => state.user.userData?.token); // Access token from Redux
+  const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState("");
   const [viewModal, setViewModal] = useState(null);
-  const [editModal, setEditModal] = useState(null);
+  const [permissionsModal, setPermissionsModal] = useState(null);
 
-  const handleDelete = (id) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this user?");
-    if (confirmDelete) {
-      setUsers(users.filter((user) => user.id !== id));
+  // Fetch users
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/users`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setUsers(data);
+      } else {
+        alert("Failed to fetch users.");
+      }
+    } catch (error) {
+      console.error("Error fetching users:", error);
     }
   };
 
-  const handleEditSave = () => {
-    setUsers(
-      users.map((user) =>
-        user.id === editModal.id ? editModal : user
-      )
-    );
-    setEditModal(null);
+  // Fetch user permissions
+  const fetchUserPermissions = async (userId) => {
+    try {
+      const response = await fetch(`${BASE_URL}/users/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setPermissionsModal(data.permissions || []); // Assuming the API returns a permissions array
+      } else {
+        alert("Failed to fetch permissions.");
+      }
+    } catch (error) {
+      console.error("Error fetching permissions:", error);
+    }
   };
+
+  // Delete a user
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this user?");
+    if (!confirmDelete) return;
+
+    try {
+      const response = await fetch(`${BASE_URL}/users/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        setUsers(users.filter((user) => user.id !== id));
+      } else {
+        alert("Failed to delete user.");
+      }
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const filteredUsers = users.filter(
     (user) =>
@@ -41,7 +88,7 @@ const Users = () => {
       <h1 className="text-center text-primary mb-4">Users</h1>
       <input
         type="text"
-        placeholder="Search by name, email, or phone number"
+        placeholder="Search by name or email"
         className="form-control mb-3"
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
@@ -49,6 +96,7 @@ const Users = () => {
       <table className="table table-bordered">
         <thead className="bg-primary text-white">
           <tr>
+            <th>ID</th>
             <th>Name</th>
             <th>Email</th>
             <th>Role</th>
@@ -58,6 +106,7 @@ const Users = () => {
         <tbody>
           {filteredUsers.map((user) => (
             <tr key={user.id}>
+              <td>{user.id}</td>
               <td>{user.name}</td>
               <td>{user.email}</td>
               <td>{user.role}</td>
@@ -69,10 +118,10 @@ const Users = () => {
                   View
                 </button>
                 <button
-                  className="btn btn-warning me-2"
-                  onClick={() => setEditModal({ ...user })}
+                  className="btn btn-secondary me-2"
+                  onClick={() => fetchUserPermissions(user.id)}
                 >
-                  Edit
+                  View Permissions
                 </button>
                 <button
                   className="btn btn-danger"
@@ -104,6 +153,7 @@ const Users = () => {
                 ></button>
               </div>
               <div className="modal-body">
+                <p><strong>ID:</strong> {viewModal.id}</p>
                 <p><strong>Name:</strong> {viewModal.name}</p>
                 <p><strong>Email:</strong> {viewModal.email}</p>
                 <p><strong>Role:</strong> {viewModal.role}</p>
@@ -122,8 +172,8 @@ const Users = () => {
         </div>
       )}
 
-      {/* Edit Modal */}
-      {editModal && (
+      {/* Permissions Modal */}
+      {permissionsModal && (
         <div
           className="modal show d-block"
           tabIndex="-1"
@@ -132,53 +182,31 @@ const Users = () => {
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Edit User</h5>
+                <h5 className="modal-title">User Permissions</h5>
                 <button
                   type="button"
                   className="btn-close"
-                  onClick={() => setEditModal(null)}
+                  onClick={() => setPermissionsModal(null)}
                 ></button>
               </div>
               <div className="modal-body">
-                <input
-                  type="text"
-                  className="form-control mb-2"
-                  value={editModal.name}
-                  onChange={(e) =>
-                    setEditModal({ ...editModal, name: e.target.value })
-                  }
-                />
-                <input
-                  type="email"
-                  className="form-control mb-2"
-                  value={editModal.email}
-                  onChange={(e) =>
-                    setEditModal({ ...editModal, email: e.target.value })
-                  }
-                />
-                <input
-                  type="text"
-                  className="form-control mb-2"
-                  value={editModal.role}
-                  onChange={(e) =>
-                    setEditModal({ ...editModal, role: e.target.value })
-                  }
-                />
+                {permissionsModal.length > 0 ? (
+                  <ul>
+                    {permissionsModal.map((perm, index) => (
+                      <li key={index}>{perm.name}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>No permissions assigned to this user.</p>
+                )}
               </div>
               <div className="modal-footer">
                 <button
                   type="button"
-                  className="btn btn-primary"
-                  onClick={handleEditSave}
-                >
-                  Save
-                </button>
-                <button
-                  type="button"
                   className="btn btn-secondary"
-                  onClick={() => setEditModal(null)}
+                  onClick={() => setPermissionsModal(null)}
                 >
-                  Cancel
+                  Close
                 </button>
               </div>
             </div>
