@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { FaSearch, FaUserCircle } from "react-icons/fa";
 import { useRouter } from "next/navigation";
-import { useAuth } from "./AuthContext"; // Import AuthContext
+import { useSelector,useDispatch } from "react-redux";
+import { login,logout } from "../redux/store";
 
 const menuData = [
   {
@@ -35,14 +36,35 @@ const menuData = [
 ];
 
 const MainNavbar = () => {
-  const { isLoggedIn, logout } = useAuth(); // Use global authentication state
+  const { isAuthenticated } = useSelector((state) => state.user) ; // Use global authentication state
   const router = useRouter();
+  const dispatch = useDispatch();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleLogout = () => {
-    logout();
-    router.push("/login"); // Redirect to login page after logout
+    // Remove token from localStorage
+    localStorage.removeItem("access_token");
+    
+    // Dispatch logout action to update Redux state
+    dispatch(logout());
+  
+    // Redirect to the login page
+    router.push("/login");
   };
+
+  const setToken= async ()=>{
+    const token =await localStorage.getItem("access_token");
+    if (token) {
+      // Simulate user data fetch or token validation
+      dispatch(login({ token }));
+    } else {
+      router.push("/login");
+    }
+  }
+  useEffect(() => {
+    setToken();
+
+  }, [dispatch, router]);
 
   return (
     <nav className="navbar navbar-expand-md navbar-dark bg-dark sticky-top px-3">
@@ -143,7 +165,7 @@ const MainNavbar = () => {
               <FaSearch color="white" />
             </button>
 
-            {isLoggedIn ? (
+            {isAuthenticated ? (
               // Profile Dropdown
               <div className="dropdown">
                 <button

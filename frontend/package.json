@@ -11,13 +11,15 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@popperjs/core": "^2.11.8",
+    "@reduxjs/toolkit": "^2.5.0",
     "@szhsin/react-menu": "^4.2.3",
     "bootstrap": "^5.3.3",
     "multiselect-react-dropdown": "^2.0.25",
     "next": "15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-icons": "^5.4.0"
+    "react-icons": "^5.4.0",
+    "react-redux": "^9.2.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
