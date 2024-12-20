@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-const BASE_URL = "http://localhost:4000/api";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const Users = () => {
   const token = useSelector((state) => state.user.userData?.token); // Access token from Redux

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import ExamDetailsSlide from "@/components/examdetailsslide";
 import ExamDetailsFAQ from "@/components/examdetailsfaq";
-
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 const ExamDetail = () => {
   const { id } = useParams();
   const router = useRouter();
@@ -15,7 +15,7 @@ const ExamDetail = () => {
   useEffect(() => {
     const fetchExamDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:4000/api/exam`);
+        const response = await fetch(`${BASE_URL}/exam`);
         if (!response.ok) {
           throw new Error("Failed to fetch exam details.");
         }

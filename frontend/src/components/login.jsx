@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { login } from "../redux/store"; // Update the path as needed
 import { useRouter } from "next/navigation";
-
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 const Login = () => {
   const dispatch = useDispatch();
   const router = useRouter();
@@ -21,7 +21,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:4000/api/auth/login", {
+      const response = await fetch(`${BASE_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

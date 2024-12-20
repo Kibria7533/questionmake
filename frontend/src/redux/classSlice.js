@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-const BASE_URL = "http://localhost:4000/api/classes";
+const BASE_URL = `${process.env.NEXT_PUBLIC_API_URL}/classes`;
 
 // Async Thunks
 export const fetchClasses = createAsyncThunk("class/fetchClasses", async () => {

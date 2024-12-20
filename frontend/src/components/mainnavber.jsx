@@ -7,7 +7,7 @@ import { FaSearch, FaUserCircle } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { login, logout } from "../redux/store";
-
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 const MainNavbar = () => {
   const { isAuthenticated } = useSelector((state) => state.user); // Use global authentication state
   const router = useRouter();
@@ -32,7 +32,7 @@ const MainNavbar = () => {
 
   const fetchMenuData = async () => {
     try {
-      const response = await fetch("http://localhost:4000/api/exam-category/exam-with-categories");
+      const response = await fetch(`${BASE_URL}/exam-category/exam-with-categories`);
       if (!response.ok) {
         throw new Error("Failed to fetch menu data");
       }

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 
-const BASE_URL = "http://localhost:4000/api";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const Roles = () => {
   const token = localStorage.getItem("access_token"); // Access token from Redux

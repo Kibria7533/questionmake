@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-const BASE_URL = "http://localhost:4000/api";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const Operators = () => {
   const token = localStorage.getItem("access_token");

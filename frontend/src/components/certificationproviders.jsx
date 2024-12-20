@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 const CertificationProviders = () => {
   const [providers, setProviders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -47,7 +47,7 @@ const CertificationProviders = () => {
   useEffect(() => {
     const fetchProviders = async () => {
       try {
-        const response = await fetch("http://localhost:4000/api/exam-category/exam-with-categories");
+        const response = await fetch(`${BASE_URL}/exam-category/exam-with-categories`);
         if (!response.ok) {
           throw new Error("Failed to fetch providers");
         }

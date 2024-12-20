@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 const Signup = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -55,7 +55,7 @@ const Signup = () => {
     setErrors({});
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:4000/api/auth/registration", {
+      const response = await fetch(`${BASE_URL}/auth/registration`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
