@@ -1,27 +1,26 @@
 import * as path from "path";
+import { config } from "dotenv";
 import { MysqlConnectionOptions } from "typeorm/driver/mysql/MysqlConnectionOptions";
 
+// Load environment variables
+config();
+
 const sourcePath = path.join(__dirname, "../");
-console.log(sourcePath);
+
 const DatabaseConfig: MysqlConnectionOptions = {
-  type: "mysql",
-  host: "127.0.0.1",
-  port: 3306,
-  username: "root",
-  password: "root",
-  database: "questionmake",
+  type: process.env.DB_TYPE as "mysql", // TypeORM expects a literal type
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT || "3306", 10),
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   entities: [sourcePath + "/database/entities/**/*{.ts,.js}"],
   extra: {
     seeds: [sourcePath + "/database/seeds/**/*{.ts,.js}"],
-    //   factories: [sourcePath + "/database/factories/**/*{.ts,.js}"],
   },
-  // poolSize: 20,
-  // migrationsTableName: "migrations",
   synchronize: true,
-  timezone: "UTC+06",
-  // migrationsRun: true, // Run migrations automatically,
-  logging: true,
-  // logger: 'file',//
-  // migrations: [sourcePath + "database/migrations/**/*{.ts,.js}"],
+  timezone: process.env.DB_TIMEZONE || "UTC",
+  logging: process.env.DB_LOGGING === "true", // Optional logging from .env
 };
+
 export default DatabaseConfig;

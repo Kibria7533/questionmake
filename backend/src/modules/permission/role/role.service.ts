@@ -80,7 +80,11 @@ export class RoleService {
   }
 
   async getAll(): Promise<RoleEntity[]> {
-    return this.repository.find();
+    const roles = await this.repository.find();
+    for (const role of roles) {
+      role.permissions = await this.getPermissionsByRoleId(role.id);
+    }
+    return roles;
   }
 
   async getOneByIdOrFail(id: number): Promise<RoleEntity> {
@@ -88,7 +92,16 @@ export class RoleService {
   }
 
   async getOneById(id: number): Promise<RoleEntity> {
-    return this.repository.findOneBy({ id });
+    const role = await this.repository.findOne({ where: { id } });
+    if (!role) {
+      throw new BadRequestException("Role not found");
+    }
+  
+    // Fetch permissions for the role
+    const permissions = await this.getPermissionsByRoleId(id);
+    role.permissions = permissions;
+  
+    return role;
   }
 
   async isNameExist(name: string, id?: number): Promise<boolean> {

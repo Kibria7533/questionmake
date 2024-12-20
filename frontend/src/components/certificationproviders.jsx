@@ -56,7 +56,10 @@ const CertificationProviders = () => {
           data.map(category => ({
             name: category.name,
             logo: `https://via.placeholder.com/150?text=${category.name}`, // Replace with actual logo URLs
-            exams: category.exams.map(exam => exam.name),
+            exams: category.exams.map(exam => ({
+              id: exam.id,
+              name: exam.name,
+            })),
           }))
         );
         setLoading(false);
@@ -102,10 +105,10 @@ const CertificationProviders = () => {
                 <h5 className="mb-3">Top {provider.name} Exams</h5>
                 {/* Exam List */}
                 <ul style={styles.examList} className="list-unstyled">
-                  {provider.exams.map((exam, idx) => (
-                    <li key={idx}>
-                      <a href={`/exams/${idx}`} style={styles.examItem}>
-                        {exam}
+                  {provider.exams.map((exam) => (
+                    <li key={exam.id}>
+                      <a href={`/exams/${exam.id}`} style={styles.examItem}>
+                        {exam.name}
                       </a>
                     </li>
                   ))}

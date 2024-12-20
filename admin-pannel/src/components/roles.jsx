@@ -1,21 +1,18 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
 
 const BASE_URL = "http://localhost:4000/api";
 
 const Roles = () => {
-  const token = useSelector((state) => state.user.userData?.token); // Access token from Redux
+  const token = localStorage.getItem("access_token"); // Access token from Redux
   const [roles, setRoles] = useState([]);
   const [roleName, setRoleName] = useState("");
   const [editingRoleId, setEditingRoleId] = useState(null);
   const [editingRoleName, setEditingRoleName] = useState("");
-  const [userId, setUserId] = useState("");
-  const [userRoleId, setUserRoleId] = useState("");
-
-  const [permissions, setPermissions] = useState([]);
   const [selectedRolePermissions, setSelectedRolePermissions] = useState([]);
+  const [selectedRoleId, setSelectedRoleId] = useState(null);
+  const [isPermissionModalOpen, setIsPermissionModalOpen] = useState(false);
 
   // Fetch roles
   const fetchRoles = async () => {
@@ -36,38 +33,23 @@ const Roles = () => {
     }
   };
 
-  // Fetch permissions for a role
-  const fetchPermissions = async (roleId) => {
-    try {
-      const response = await fetch(`${BASE_URL}/roles/${roleId}/permissions`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setSelectedRolePermissions(data);
-      } else {
-        alert("Failed to fetch permissions.");
-      }
-    } catch (error) {
-      console.error("Error fetching permissions:", error);
-    }
-  };
-
   // Add a new role
-  const handleAddRole = async () => {
-    if (!roleName) return alert("Role name is required");
+  const addRole = async () => {
+    if (!roleName.trim()) {
+      alert("Role name is required");
+      return;
+    }
 
     try {
       const response = await fetch(`${BASE_URL}/roles`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ name: roleName }),
       });
+
       if (response.ok) {
         const newRole = await response.json();
         setRoles([...roles, newRole]);
@@ -81,30 +63,30 @@ const Roles = () => {
   };
 
   // Edit an existing role
-  const handleEditRole = (id, name) => {
-    setEditingRoleId(id);
+  const editRole = (roleId, name) => {
+    setEditingRoleId(roleId);
     setEditingRoleName(name);
   };
 
-  const handleSaveEdit = async () => {
-    if (!editingRoleName) return alert("Role name is required");
+  const saveEditedRole = async () => {
+    if (!editingRoleName.trim()) {
+      alert("Role name is required");
+      return;
+    }
 
     try {
       const response = await fetch(`${BASE_URL}/roles/${editingRoleId}`, {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ name: editingRoleName }),
       });
+
       if (response.ok) {
         const updatedRole = await response.json();
-        setRoles(
-          roles.map((role) =>
-            role.id === editingRoleId ? { ...role, name: updatedRole.name } : role
-          )
-        );
+        setRoles(roles.map((role) => (role.id === editingRoleId ? updatedRole : role)));
         setEditingRoleId(null);
         setEditingRoleName("");
       } else {
@@ -116,18 +98,21 @@ const Roles = () => {
   };
 
   // Delete a role
-  const handleDeleteRole = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this role?")) return;
+  const deleteRole = async (roleId) => {
+    if (!window.confirm("Are you sure you want to delete this role?")) {
+      return;
+    }
 
     try {
-      const response = await fetch(`${BASE_URL}/roles/${id}`, {
+      const response = await fetch(`${BASE_URL}/roles/${roleId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+
       if (response.ok) {
-        setRoles(roles.filter((role) => role.id !== id));
+        setRoles(roles.filter((role) => role.id !== roleId));
       } else {
         alert("Failed to delete role.");
       }
@@ -136,29 +121,18 @@ const Roles = () => {
     }
   };
 
-  // Assign role to user
-  const handleAssignRole = async () => {
-    if (!userId || !userRoleId) return alert("Both User ID and Role ID are required");
+  // Open modal and set permissions
+  const openPermissionModal = (permissions, roleId) => {
+    setSelectedRolePermissions(permissions);
+    setSelectedRoleId(roleId);
+    setIsPermissionModalOpen(true);
+  };
 
-    try {
-      const response = await fetch(`${BASE_URL}/roles/${userRoleId}/assign-permissions`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ userId }),
-      });
-      if (response.ok) {
-        alert("Role assigned successfully.");
-        setUserId("");
-        setUserRoleId("");
-      } else {
-        alert("Failed to assign role.");
-      }
-    } catch (error) {
-      console.error("Error assigning role:", error);
-    }
+  // Close Permission Modal
+  const closePermissionModal = () => {
+    setIsPermissionModalOpen(false);
+    setSelectedRoleId(null);
+    setSelectedRolePermissions([]);
   };
 
   useEffect(() => {
@@ -176,29 +150,13 @@ const Roles = () => {
       marginBottom: "20px",
     },
     form: {
-      display: "flex",
-      alignItems: "center",
       marginBottom: "20px",
-      gap: "10px",
     },
     input: {
       padding: "10px",
-      fontSize: "1rem",
+      marginRight: "10px",
       borderRadius: "5px",
       border: "1px solid #ccc",
-    },
-    button: {
-      padding: "10px 15px",
-      fontSize: "1rem",
-      border: "none",
-      borderRadius: "5px",
-      cursor: "pointer",
-      backgroundColor: "#004080",
-      color: "white",
-      transition: "background-color 0.3s",
-    },
-    buttonDanger: {
-      backgroundColor: "#d9534f",
     },
     table: {
       width: "100%",
@@ -215,11 +173,37 @@ const Roles = () => {
       border: "1px solid #ccc",
       padding: "10px",
     },
-    rowEven: {
-      backgroundColor: "#f9f9f9",
+    button: {
+      padding: "10px 15px",
+      fontSize: "1rem",
+      border: "none",
+      borderRadius: "5px",
+      cursor: "pointer",
+      backgroundColor: "#004080",
+      color: "white",
+      transition: "background-color 0.3s",
     },
-    rowOdd: {
-      backgroundColor: "#fff",
+    buttonDanger: {
+      backgroundColor: "#d9534f",
+    },
+    modal: {
+      position: "fixed",
+      top: "0",
+      left: "0",
+      width: "100%",
+      height: "100%",
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    modalContent: {
+      backgroundColor: "white",
+      padding: "20px",
+      borderRadius: "5px",
+      width: "50%",
+      maxHeight: "80%",
+      overflowY: "auto",
     },
   };
 
@@ -227,7 +211,7 @@ const Roles = () => {
     <div style={styles.container}>
       <h1 style={styles.title}>Roles Management</h1>
 
-      {/* Add Role Form */}
+      {/* Add Role */}
       <div style={styles.form}>
         <input
           type="text"
@@ -236,35 +220,7 @@ const Roles = () => {
           onChange={(e) => setRoleName(e.target.value)}
           style={styles.input}
         />
-        <button style={styles.button} onClick={handleAddRole}>
-          Add Role
-        </button>
-      </div>
-
-      {/* Assign Role to User */}
-      <div style={styles.form}>
-        <input
-          type="text"
-          placeholder="Enter User ID"
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-          style={styles.input}
-        />
-        <select
-          value={userRoleId}
-          onChange={(e) => setUserRoleId(e.target.value)}
-          style={styles.input}
-        >
-          <option value="">Select Role</option>
-          {roles.map((role) => (
-            <option key={role.id} value={role.id}>
-              {role.name}
-            </option>
-          ))}
-        </select>
-        <button style={styles.button} onClick={handleAssignRole}>
-          Assign Role
-        </button>
+        <button style={styles.button} onClick={addRole}>Add Role</button>
       </div>
 
       {/* Roles Table */}
@@ -277,11 +233,8 @@ const Roles = () => {
           </tr>
         </thead>
         <tbody>
-          {roles.map((role, index) => (
-            <tr
-              key={role.id}
-              style={index % 2 === 0 ? styles.rowEven : styles.rowOdd}
-            >
+          {roles.map((role) => (
+            <tr key={role.id}>
               <td style={styles.td}>{role.id}</td>
               <td style={styles.td}>
                 {editingRoleId === role.id ? (
@@ -297,26 +250,19 @@ const Roles = () => {
               </td>
               <td style={styles.td}>
                 {editingRoleId === role.id ? (
-                  <button style={styles.button} onClick={handleSaveEdit}>
-                    Save
-                  </button>
+                  <button style={styles.button} onClick={saveEditedRole}>Save</button>
                 ) : (
-                  <button
-                    style={styles.button}
-                    onClick={() => handleEditRole(role.id, role.name)}
-                  >
-                    Edit
-                  </button>
+                  <button style={styles.button} onClick={() => editRole(role.id, role.name)}>Edit</button>
                 )}
                 <button
                   style={{ ...styles.button, ...styles.buttonDanger, marginLeft: "10px" }}
-                  onClick={() => handleDeleteRole(role.id)}
+                  onClick={() => deleteRole(role.id)}
                 >
                   Delete
                 </button>
                 <button
                   style={{ ...styles.button, marginLeft: "10px" }}
-                  onClick={() => fetchPermissions(role.id)}
+                  onClick={() => openPermissionModal(role.permissions, role.id)}
                 >
                   View Permissions
                 </button>
@@ -326,15 +272,27 @@ const Roles = () => {
         </tbody>
       </table>
 
-      {/* Display Permissions */}
-      {selectedRolePermissions.length > 0 && (
-        <div>
-          <h3>Permissions for Selected Role:</h3>
-          <ul>
-            {selectedRolePermissions.map((perm) => (
-              <li key={perm.id}>{perm.name}</li>
-            ))}
-          </ul>
+      {/* Permission Modal */}
+      {isPermissionModalOpen && (
+        <div style={styles.modal}>
+          <div style={styles.modalContent}>
+            <h3>Permissions for Role ID: {selectedRoleId}</h3>
+            {selectedRolePermissions.length > 0 ? (
+              <ul>
+                {selectedRolePermissions.map((perm) => (
+                  <li key={perm.id}>{perm.name}</li>
+                ))}
+              </ul>
+            ) : (
+              <p>No permissions assigned to this role.</p>
+            )}
+            <button
+              style={{ ...styles.button, marginTop: "20px" }}
+              onClick={closePermissionModal}
+            >
+              Close
+            </button>
+          </div>
         </div>
       )}
     </div>
