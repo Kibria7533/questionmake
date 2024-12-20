@@ -1,56 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const CertificationProviders = () => {
-  const providers = [
-    {
-      name: "Amazon",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
-      exams: [
-        "AWS Certified Advanced Networking - Specialty ANS-C01",
-        "AWS Certified AI Practitioner AIF-C01",
-        "AWS Certified Cloud Practitioner CLF-C02",
-        "AWS Certified Data Engineer - Associate DEA-C01",
-        "AWS Certified Developer - Associate DVA-C02",
-        "AWS Certified Solutions Architect - Associate SAA-C03",
-      ],
-    },
-    {
-      name: "Cisco",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/9/91/Cisco_logo.svg",
-      exams: [
-        "200-201: Cisco Cybersecurity Operations",
-        "300-301: Cisco Certified Network Associate (CCNA)",
-        "300-420: Designing Cisco Enterprise Networks",
-        "350-401: Cisco Enterprise Network Core Technologies",
-        "500-220: Cisco Meraki Solutions Specialist",
-      ],
-    },
-    {
-      name: "Microsoft",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg",
-      exams: [
-        "AZ-104: Microsoft Azure Administrator",
-        "AZ-204: Developing Microsoft Azure Solutions",
-        "AZ-500: Microsoft Azure Security Technologies",
-        "DP-100: Data Science Solution on Azure",
-        "SC-900: Microsoft Security Fundamentals",
-      ],
-    },
-    {
-      name: "CompTIA",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/8/83/CompTIA_logo.svg",
-      exams: [
-        "220-1101: CompTIA A+ Certification Exam",
-        "N10-008: CompTIA Network+",
-        "SY0-701: CompTIA Security+ 2023",
-        "PT0-002: CompTIA PenTest+",
-        "XK0-005: CompTIA Linux+",
-      ],
-    },
-  ];
+  const [providers, setProviders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const styles = {
     section: {
@@ -74,7 +30,7 @@ const CertificationProviders = () => {
       display: "flex",
       flexDirection: "column",
       justifyContent: "space-between",
-      height: "100%", // Ensures cards stretch evenly
+      height: "100%",
     },
     examList: {
       textAlign: "left",
@@ -87,6 +43,42 @@ const CertificationProviders = () => {
       lineHeight: "1.6",
     },
   };
+
+  useEffect(() => {
+    const fetchProviders = async () => {
+      try {
+        const response = await fetch("http://localhost:4000/api/exam-category/exam-with-categories");
+        if (!response.ok) {
+          throw new Error("Failed to fetch providers");
+        }
+        const data = await response.json();
+        setProviders(
+          data.map(category => ({
+            name: category.name,
+            logo: `https://via.placeholder.com/150?text=${category.name}`, // Replace with actual logo URLs
+            exams: category.exams.map(exam => ({
+              id: exam.id,
+              name: exam.name,
+            })),
+          }))
+        );
+        setLoading(false);
+      } catch (error) {
+        setError(error.message);
+        setLoading(false);
+      }
+    };
+
+    fetchProviders();
+  }, []);
+
+  if (loading) {
+    return <div className="text-center">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center text-danger">Error: {error}</div>;
+  }
 
   return (
     <div style={styles.section}>
@@ -113,10 +105,10 @@ const CertificationProviders = () => {
                 <h5 className="mb-3">Top {provider.name} Exams</h5>
                 {/* Exam List */}
                 <ul style={styles.examList} className="list-unstyled">
-                  {provider.exams.map((exam, idx) => (
-                    <li key={idx}>
-                      <a href={`/exams/${idx}`} style={styles.examItem}>
-                        {exam}
+                  {provider.exams.map((exam) => (
+                    <li key={exam.id}>
+                      <a href={`/exams/${exam.id}`} style={styles.examItem}>
+                        {exam.name}
                       </a>
                     </li>
                   ))}

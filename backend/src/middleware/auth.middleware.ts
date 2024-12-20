@@ -5,7 +5,6 @@ import { JwtService } from "@nestjs/jwt";
 import { UserEntity } from "../database/entities/user.entity";
 import { AuthUser } from "../config/alc";
 import { BEARER_TOKEN_KEY } from "../config/constant";
-import { LoginDto } from "../modules/user/dto/login.dto";
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
@@ -19,15 +18,11 @@ export class AuthMiddleware implements NestMiddleware {
     const userToken: any = req.headers[BEARER_TOKEN_KEY];
     const token: string = userToken?.split(" ")[1];
 
-    console.log("token => ", token);
-
     if (!token) {
       return next();
     }
 
     const jwtPayload: any = this.jwtService.decode(token, { json: true });
-
-    console.log("sub => ", jwtPayload.sub);
 
     if (!jwtPayload?.sub) {
       return next();

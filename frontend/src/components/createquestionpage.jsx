@@ -1,9 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation"; // Import useRouter for navigation
 import Multiselect from "multiselect-react-dropdown";
 
 const CreateQuestion = () => {
+  const router = useRouter(); // Initialize the router
+
   const styles = {
     container: {
       fontFamily: "Arial, sans-serif",
@@ -125,6 +128,11 @@ const CreateQuestion = () => {
     });
   };
 
+  const handleGenerateQuestions = () => {
+    // Redirect to the questiondownload page
+    router.push("/questiondownload");
+  };
+
   const totalQuestions = requirements.reduce(
     (total, req) => total + Number(req.numberOfQuestions),
     0
@@ -212,7 +220,9 @@ const CreateQuestion = () => {
 
       <div style={styles.totalSection}>Total Questions: {totalQuestions}</div>
 
-      <button style={styles.generateButton}>Generate Questions</button>
+      <button onClick={handleGenerateQuestions} style={styles.generateButton}>
+        Generate Questions
+      </button>
     </div>
   );
 };

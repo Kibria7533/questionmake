@@ -2,7 +2,6 @@ import { Repository } from "typeorm";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { UserEntity } from "../entities/user.entity";
-import { ObjectId } from "mongodb";
 
 @Injectable()
 export class UserRepository extends Repository<UserEntity> {
@@ -11,22 +10,22 @@ export class UserRepository extends Repository<UserEntity> {
   }
 
   async getAll(): Promise<UserEntity[]> {
-    return this.find({ select: ["_id", "name", "mobile", "email", "dob"] });
+    return this.find({ select: ["id", "name", "mobile", "email", "dob"] });
   }
 
-  async getAuthUser(sub: string): Promise<UserEntity> {
-    return this.findOne({ where: { _id: new ObjectId(sub) }, select: ["_id", "name", "mobile", "email", "role"] });
+  async getAuthUser(sub: number): Promise<UserEntity> {
+    return this.findOne({ where: { id: sub }, select: ["id", "name", "mobile", "email", "role"] });
   }
 
-  async getOneById(id: string): Promise<UserEntity> {
-    return this.findOne({ where: { _id: new ObjectId(id) }, select: ["_id", "name", "mobile", "email", "role"] });
+  async getOneById(id: number): Promise<UserEntity> {
+    return this.findOne({ where: { id }, select: ["id", "name", "mobile", "email", "role"] });
   }
 
   async getOneByMobile(mobile: string): Promise<UserEntity> {
-    return this.findOne({ where: { mobile }, select: ["_id", "name", "mobile", "password"] });
+    return this.findOne({ where: { mobile }, select: ["id", "name", "mobile", "password"] });
   }
 
   async getOneForLogin(mobile: string): Promise<UserEntity> {
-    return this.findOne({ where: { mobile }, select: ["_id", "password"] });
+    return this.findOne({ where: { mobile }, select: ["id", "password"] });
   }
 }

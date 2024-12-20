@@ -1,10 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import CertificationProviders from "@/components/certificationproviders";
 import Testimonials from "@/components/testimonials";
 import CounterSection from "@/components/countersection";
+import { Provider, useDispatch } from "react-redux";
+import { login, logout } from "../redux/store";
+import { useRouter } from "next/navigation";
 
 const Home = () => {
   const styles = {

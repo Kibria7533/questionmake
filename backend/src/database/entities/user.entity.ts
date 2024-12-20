@@ -1,11 +1,13 @@
-import { Entity, ObjectIdColumn, Column } from "typeorm";
-import { ObjectId } from "mongodb";
+import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 import { Role } from "../../config/enum";
+import { TABLE_USERS } from "../../config/database.table";
+import { enumToString } from "../../config/utils";
+import { PermissionEntity } from "./permission.entity";
 
-@Entity()
+@Entity(TABLE_USERS)
 export class UserEntity {
-  @ObjectIdColumn()
-  _id: ObjectId;
+  @PrimaryGeneratedColumn({ type: "int" })
+  id: number;
 
   @Column()
   name: string;
@@ -19,9 +21,13 @@ export class UserEntity {
   @Column({ select: false })
   password: string;
 
-  @Column()
+  @Column({ type: "date" })
   dob: string;
 
-  @Column({ select: false, enum: Role, default: Role.REGULAR })
+  @Column({ select: false, comment: enumToString(Role), type: "int", default: Role.REGULAR })
   role: number;
+
+  // virtual
+  permissions: PermissionEntity[];
+  permission_keys: string[];
 }

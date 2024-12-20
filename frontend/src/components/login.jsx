@@ -1,9 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { login } from "../redux/store"; // Update the path as needed
 import { useRouter } from "next/navigation";
 
 const Login = () => {
+  const dispatch = useDispatch();
   const router = useRouter();
   const [formData, setFormData] = useState({ mobile: "", password: "" });
   const [loading, setLoading] = useState(false);
@@ -30,12 +33,11 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Store the access token in localStorage
-        localStorage.setItem("access_token", data.access_token);
-        router.push("/profile"); // Redirect to the profile page
-        setTimeout(() => {
-          window.location.reload();
-        }, 50); // Small delay to ensure navigation happens first
+        localStorage.setItem("access_token", data.access_token)
+        // Dispatch the login action to Redux
+        dispatch(login({ token: data.access_token, user: data.user }));
+        // Redirect to the profile page
+        router.push("/profile");
       } else {
         throw new Error(data.message || "Login failed. Please try again.");
       }

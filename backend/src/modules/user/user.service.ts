@@ -6,16 +6,21 @@ import * as bcrypt from "bcrypt";
 import { HASH_ROUND } from "../../config/constant";
 import { Role } from "../../config/enum";
 import { ChangeRoleDto } from "./dto/change-role.dto";
+import { RoleService } from "../permission/role/role.service";
+import { PermissionEntity } from "../../database/entities/permission.entity";
 
 @Injectable()
 export class UserService {
   @Inject()
   private readonly userRepository: UserRepository;
 
+  @Inject()
+  private readonly roleService: RoleService;
+
   async create(reqDto: CreateUserDto): Promise<UserEntity> {
     const isExist: UserEntity = await this.getOneByMobile(reqDto.mobile);
 
-    if (isExist?._id) {
+    if (isExist?.id) {
       throw new BadRequestException("User already exists");
     }
 
@@ -51,15 +56,22 @@ export class UserService {
     return this.userRepository.getAll();
   }
 
-  async getAuthUser(sub: string): Promise<UserEntity> {
-    return this.userRepository.getAuthUser(sub);
+  async getAuthUser(sub: number): Promise<UserEntity> {
+    const user: UserEntity = await this.userRepository.getAuthUser(sub);
+    if (user?.id) {
+      const permissions: PermissionEntity[] = await this.roleService.getPermissionsByRoleId(user.role);
+      user.permission_keys = permissions?.map((item: PermissionEntity) => {
+        return item.name;
+      });
+    }
+    return user;
   }
 
   async getOneByMobile(mobile: string): Promise<UserEntity> {
     return this.userRepository.getOneByMobile(mobile);
   }
 
-  async getOneById(id: string): Promise<UserEntity> {
+  async getOneById(id: number): Promise<UserEntity> {
     return this.userRepository.getOneById(id);
   }
 }

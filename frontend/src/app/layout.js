@@ -1,10 +1,11 @@
+"use client"
 import { Geist, Geist_Mono } from "next/font/google";
 //import "./globals.css";
 import { Footer } from "../components/footer";
 import TopNavbar from "@/components/topnavber";
 import MainNavbar from "@/components/mainnavber";
-import { AuthProvider } from "@/components/AuthContext";
-
+import { Provider } from "react-redux";
+import store from "../redux/store";
 
 export default function RootLayout({ children }) {
   const styles = {
@@ -19,8 +20,12 @@ export default function RootLayout({ children }) {
     },
   };
 
+
+
+
+
   return (
-    <AuthProvider>
+    <Provider store={store}>
     <html lang="en">
       <body style={styles.body}>
        <TopNavbar />
@@ -29,6 +34,6 @@ export default function RootLayout({ children }) {
         <Footer />
       </body>
     </html>
-    </AuthProvider>
+    </Provider>
   );
 }
