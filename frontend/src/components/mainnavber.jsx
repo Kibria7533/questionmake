@@ -1,69 +1,62 @@
 "use client";
 
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { FaSearch, FaUserCircle } from "react-icons/fa";
 import { useRouter } from "next/navigation";
-import { useSelector,useDispatch } from "react-redux";
-import { login,logout } from "../redux/store";
-
-const menuData = [
-  {
-    category: "Engineering",
-    items: [
-      { name: "GATE", link: "/exams/gate" },
-      { name: "JEE", link: "/exams/jee" },
-      { name: "IES", link: "/exams/ies" },
-    ],
-  },
-  {
-    category: "Medical",
-    items: [
-      { name: "NEET", link: "/exams/neet" },
-      { name: "AIIMS", link: "/exams/aiims" },
-      { name: "JIPMER", link: "/exams/jipmer" },
-    ],
-  },
-  {
-    category: "Government",
-    items: [
-      { name: "UPSC", link: "/exams/upsc" },
-      { name: "SSC", link: "/exams/ssc" },
-      { name: "Railways", link: "/exams/railways" },
-    ],
-  },
-];
+import { useSelector, useDispatch } from "react-redux";
+import { login, logout } from "../redux/store";
 
 const MainNavbar = () => {
-  const { isAuthenticated } = useSelector((state) => state.user) ; // Use global authentication state
+  const { isAuthenticated } = useSelector((state) => state.user); // Use global authentication state
   const router = useRouter();
   const dispatch = useDispatch();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [menuData, setMenuData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const handleLogout = () => {
-    // Remove token from localStorage
     localStorage.removeItem("access_token");
-    
-    // Dispatch logout action to update Redux state
     dispatch(logout());
-  
-    // Redirect to the login page
     router.push("/login");
   };
 
-  const setToken= async ()=>{
-    const token =await localStorage.getItem("access_token");
+  const setToken = async () => {
+    const token = await localStorage.getItem("access_token");
     if (token) {
-      // Simulate user data fetch or token validation
       dispatch(login({ token }));
     } else {
       router.push("/login");
     }
-  }
+  };
+
+  const fetchMenuData = async () => {
+    try {
+      const response = await fetch("http://localhost:4000/api/exam-category/exam-with-categories");
+      if (!response.ok) {
+        throw new Error("Failed to fetch menu data");
+      }
+      const data = await response.json();
+      const formattedData = data.map((category) => ({
+        category: category.name,
+        items: category.exams.map((exam) => ({
+          name: exam.name,
+          link: `/exams/${exam.id}`,
+        })),
+      }));
+      setMenuData(formattedData);
+      setLoading(false);
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     setToken();
-
+    fetchMenuData();
   }, [dispatch, router]);
 
   return (
@@ -116,28 +109,34 @@ const MainNavbar = () => {
                 }`}
                 aria-labelledby="navbarDropdown"
               >
-                <div className="container">
-                  <div className="row">
-                    {menuData.map((menu, index) => (
-                      <div
-                        key={index}
-                        className="col-md-4 border-end mb-3"
-                        style={{ paddingLeft: "10px" }}
-                      >
-                        <h6 className="text-primary">{menu.category}</h6>
-                        <ul className="list-unstyled">
-                          {menu.items.map((item, idx) => (
-                            <li key={idx} className="mb-1">
-                              <a href={item.link} className="text-dark">
-                                {item.name}
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
+                {loading ? (
+                  <div className="text-center">Loading...</div>
+                ) : error ? (
+                  <div className="text-danger">Error: {error}</div>
+                ) : (
+                  <div className="container">
+                    <div className="row">
+                      {menuData.map((menu, index) => (
+                        <div
+                          key={index}
+                          className="col-md-4 border-end mb-3"
+                          style={{ paddingLeft: "10px" }}
+                        >
+                          <h6 className="text-primary">{menu.category}</h6>
+                          <ul className="list-unstyled">
+                            {menu.items.map((item, idx) => (
+                              <li key={idx} className="mb-1">
+                                <a href={item.link} className="text-dark">
+                                  {item.name}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </li>
 
@@ -166,7 +165,6 @@ const MainNavbar = () => {
             </button>
 
             {isAuthenticated ? (
-              // Profile Dropdown
               <div className="dropdown">
                 <button
                   className="btn btn-outline-light dropdown-toggle"
@@ -197,7 +195,6 @@ const MainNavbar = () => {
                 </ul>
               </div>
             ) : (
-              // Login and Signup Links
               <div>
                 <a
                   href="/login"

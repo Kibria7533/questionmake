@@ -9,42 +9,77 @@ import { fetchExams, addExam, updateExam, deleteExam } from "../redux/examSlice"
 const ExamSettings = () => {
   const dispatch = useDispatch();
 
-  // Access Redux state
   const examCategories = useSelector((state) => state.examCategory.categories);
   const exams = useSelector((state) => state.exam.exams);
   const loading = useSelector((state) => state.exam.loading);
 
-  const [newExam, setNewExam] = useState({ name: "", categoryId: "" });
+  const [newExam, setNewExam] = useState({
+    name: "",
+    categoryId: "",
+    questions: "",
+    passed: "",
+    score: "",
+    description: "",
+  });
+
   const [editExam, setEditExam] = useState(null);
 
   useEffect(() => {
-    // Fetch categories and exams from Redux store
     dispatch(fetchExamCategories());
     dispatch(fetchExams());
   }, [dispatch]);
 
   const handleAddExam = () => {
-    if (!newExam.name || !newExam.categoryId) {
-      return alert("Please provide both exam name and category.");
+    if (
+      !newExam.name ||
+      !newExam.categoryId ||
+      !newExam.questions ||
+      !newExam.passed ||
+      !newExam.score ||
+      !newExam.description
+    ) {
+      return alert("Please fill out all fields.");
     }
     dispatch(
       addExam({
         name: newExam.name,
         exam_category_id: Number(newExam.categoryId),
+        questions: Number(newExam.questions),
+        passed: Number(newExam.passed),
+        score: newExam.score,
+        description: newExam.description,
       })
     );
-    setNewExam({ name: "", categoryId: "" });
+    setNewExam({
+      name: "",
+      categoryId: "",
+      questions: "",
+      passed: "",
+      score: "",
+      description: "",
+    });
   };
 
   const handleUpdateExam = () => {
-    if (!editExam.name || !editExam.categoryId) {
-      return alert("Please provide both exam name and category.");
+    if (
+      !editExam.name ||
+      !editExam.categoryId ||
+      !editExam.questions ||
+      !editExam.passed ||
+      !editExam.score ||
+      !editExam.description
+    ) {
+      return alert("Please fill out all fields.");
     }
     dispatch(
       updateExam({
         id: editExam.id,
         name: editExam.name,
         exam_category_id: Number(editExam.categoryId),
+        questions: Number(editExam.questions),
+        passed: Number(editExam.passed),
+        score: editExam.score,
+        description: editExam.description,
       })
     );
     setEditExam(null);
@@ -62,16 +97,16 @@ const ExamSettings = () => {
       <h3 className="text-secondary">Exam Settings</h3>
 
       {/* Add Exam */}
-      <div className="mb-3 d-flex">
+      <div className="mb-3">
         <input
           type="text"
-          className="form-control me-2"
+          className="form-control mb-2"
           placeholder="Exam Name"
           value={newExam.name}
           onChange={(e) => setNewExam({ ...newExam, name: e.target.value })}
         />
         <select
-          className="form-control me-2"
+          className="form-control mb-2"
           value={newExam.categoryId}
           onChange={(e) => setNewExam({ ...newExam, categoryId: e.target.value })}
         >
@@ -82,6 +117,33 @@ const ExamSettings = () => {
             </option>
           ))}
         </select>
+        <input
+          type="number"
+          className="form-control mb-2"
+          placeholder="Number of Questions"
+          value={newExam.questions}
+          onChange={(e) => setNewExam({ ...newExam, questions: e.target.value })}
+        />
+        <input
+          type="number"
+          className="form-control mb-2"
+          placeholder="Number of Students Passed"
+          value={newExam.passed}
+          onChange={(e) => setNewExam({ ...newExam, passed: e.target.value })}
+        />
+        <input
+          type="text"
+          className="form-control mb-2"
+          placeholder="Average Score (e.g., '95.1%')"
+          value={newExam.score}
+          onChange={(e) => setNewExam({ ...newExam, score: e.target.value })}
+        />
+        <textarea
+          className="form-control mb-2"
+          placeholder="Description"
+          value={newExam.description}
+          onChange={(e) => setNewExam({ ...newExam, description: e.target.value })}
+        />
         <button className="btn btn-success" onClick={handleAddExam}>
           Add
         </button>
@@ -96,6 +158,10 @@ const ExamSettings = () => {
             <tr>
               <th>Exam Name</th>
               <th>Category</th>
+              <th>Questions</th>
+              <th>Passed</th>
+              <th>Score</th>
+              <th>Description</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -109,10 +175,19 @@ const ExamSettings = () => {
                       ?.name || "Unknown"
                   }
                 </td>
+                <td>{exam.questions}</td>
+                <td>{exam.passed}</td>
+                <td>{exam.score}</td>
+                <td>{exam.description}</td>
                 <td>
                   <button
                     className="btn btn-warning me-2"
-                    onClick={() => setEditExam({ ...exam, categoryId: exam.exam_category_id })}
+                    onClick={() =>
+                      setEditExam({
+                        ...exam,
+                        categoryId: exam.exam_category_id,
+                      })
+                    }
                   >
                     Edit
                   </button>
@@ -147,24 +222,77 @@ const ExamSettings = () => {
                 ></button>
               </div>
               <div className="modal-body">
-                <input
-                  type="text"
-                  className="form-control mb-2"
-                  value={editExam.name}
-                  onChange={(e) => setEditExam({ ...editExam, name: e.target.value })}
-                />
-                <select
-                  className="form-control"
-                  value={editExam.categoryId}
-                  onChange={(e) => setEditExam({ ...editExam, categoryId: e.target.value })}
-                >
-                  <option value="">Select Category</option>
-                  {examCategories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
+                <div className="mb-3">
+                  <label className="form-label">Exam Name</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={editExam.name}
+                    onChange={(e) =>
+                      setEditExam({ ...editExam, name: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">Category</label>
+                  <select
+                    className="form-control"
+                    value={editExam.categoryId}
+                    onChange={(e) =>
+                      setEditExam({ ...editExam, categoryId: e.target.value })
+                    }
+                  >
+                    <option value="">Select Category</option>
+                    {examCategories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">Number of Questions</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    value={editExam.questions}
+                    onChange={(e) =>
+                      setEditExam({ ...editExam, questions: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">Number of Students Passed</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    value={editExam.passed}
+                    onChange={(e) =>
+                      setEditExam({ ...editExam, passed: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">Average Score</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={editExam.score}
+                    onChange={(e) =>
+                      setEditExam({ ...editExam, score: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">Description</label>
+                  <textarea
+                    className="form-control"
+                    value={editExam.description}
+                    onChange={(e) =>
+                      setEditExam({ ...editExam, description: e.target.value })
+                    }
+                  />
+                </div>
               </div>
               <div className="modal-footer">
                 <button
