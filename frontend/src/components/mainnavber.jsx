@@ -26,10 +26,8 @@ const MainNavbar = () => {
   const setToken = async () => {
     const token = await localStorage.getItem("access_token");
     if (token) {
-      dispatch(login({ token }));
-    } else {
-      router.push("/login");
-    }
+      const token = await localStorage.getItem("access_token");
+    } 
   };
 
   const fetchMenuData = async () => {
