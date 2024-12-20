@@ -1,39 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-// Sample Certification Providers Data
-const providers = [
-  { name: "A10 Networks", exams: 1 },
-  { name: "ACAMS", exams: 1 },
-  { name: "AHIMA", exams: 2 },
-  { name: "AIWMI", exams: 1 },
-  { name: "AndroidATC", exams: 3 },
-  { name: "Apple", exams: 5 },
-  { name: "ASQ", exams: 7 },
-  { name: "AWS", exams: 25 },
-  { name: "CISSP", exams: 23 },
-  { name: "CompTIA", exams: 44 },
-  { name: "Microsoft", exams: 210 },
-  { name: "Cisco", exams: 194 },
-  { name: "Dell", exams: 72 },
-  { name: "Fortinet", exams: 61 },
-  { name: "IBM", exams: 104 },
-  { name: "Juniper", exams: 55 },
-  { name: "Oracle", exams: 58 },
-  { name: "Google", exams: 23 },
-  { name: "Huawei", exams: 19 },
-  { name: "Hitachi", exams: 3 },
-  { name: "VMware", exams: 32 },
-  { name: "Isaca", exams: 9 },
-  { name: "Nutanix", exams: 6 },
-  { name: "ISC", exams: 23 },
-  { name: "ServiceNow", exams: 13 },
-  { name: "EC-Council", exams: 11 },
-];
-
 const ViewAllExams = () => {
+  const [providers, setProviders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const styles = {
     pageContainer: {
       padding: "40px",
@@ -82,6 +56,38 @@ const ViewAllExams = () => {
       color: "#555",
     },
   };
+
+  useEffect(() => {
+    const fetchProviders = async () => {
+      try {
+        const response = await fetch("http://localhost:4000/api/exam-category/exam-with-categories");
+        if (!response.ok) {
+          throw new Error("Failed to fetch providers");
+        }
+        const data = await response.json();
+        setProviders(
+          data.map(category => ({
+            name: category.name,
+            exams: category.exams.length,
+          }))
+        );
+        setLoading(false);
+      } catch (error) {
+        setError(error.message);
+        setLoading(false);
+      }
+    };
+
+    fetchProviders();
+  }, []);
+
+  if (loading) {
+    return <div style={styles.pageContainer}>Loading...</div>;
+  }
+
+  if (error) {
+    return <div style={styles.pageContainer}>Error: {error}</div>;
+  }
 
   return (
     <div style={styles.pageContainer}>

@@ -6,6 +6,7 @@ import { UpdateExamCategoryDto } from "./dto/update-exam-category.dto";
 import { ExamCategoryEntity } from "../../database/entities/exam-category.entity";
 import { CreateExamCategoryDto } from "./dto/create-exam-category.dto";
 import { DeleteResult } from "typeorm/query-builder/result/DeleteResult";
+import { ExamCategoryWithExamsDto } from "./dto/exam-with-category.dto";
 
 @Controller("exam-category")
 export class ExamCategoryController extends PublicBaseController {
@@ -31,9 +32,8 @@ export class ExamCategoryController extends PublicBaseController {
     return this.service.getAll();
   }
   @Get("/exam-with-categories")
-  async getAllCategoriesWithExams(): Promise<ExamCategoryEntity[]> {
-    console.log("api called")
-  return this.service.getAllCategoriesWithExams();
+  async getAllCategoriesWithExams(): Promise<ExamCategoryWithExamsDto[]> {
+    return this.service.getAllCategoriesWithExams();
   }
 
   @Get(":id")

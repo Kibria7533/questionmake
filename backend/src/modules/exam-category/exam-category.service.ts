@@ -4,6 +4,7 @@ import { ExamCategoryEntity } from "../../database/entities/exam-category.entity
 import { CreateExamCategoryDto } from "./dto/create-exam-category.dto";
 import { ExamCategoryRepository } from "../../database/repositories/exam-category.repository";
 import { DeleteResult } from "typeorm/query-builder/result/DeleteResult";
+import { ExamCategoryWithExamsDto } from "./dto/exam-with-category.dto";
 
 @Injectable()
 export class ExamCategoryService {
@@ -55,8 +56,17 @@ export class ExamCategoryService {
     return this.repository.delete(id);
   }
   
-  async getAllCategoriesWithExams(): Promise<ExamCategoryEntity[]> {
-    return this.repository.getAllWithExams();
+  async getAllCategoriesWithExams(): Promise<ExamCategoryWithExamsDto[]> {
+    const categories = await this.repository.getAllWithExams();
+    return categories.map(category => ({
+      id: category.id,
+      name: category.name,
+      exams: category.exams.map(exam => ({
+        id: exam.id,
+        name: exam.name,
+      })),
+    }));
   }
+  
   
 }
