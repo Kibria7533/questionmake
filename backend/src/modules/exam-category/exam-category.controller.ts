@@ -31,6 +31,7 @@ export class ExamCategoryController extends PublicBaseController {
   async getAll(): Promise<ExamCategoryEntity[]> {
     return this.service.getAll();
   }
+
   @Get("/exam-with-categories")
   async getAllCategoriesWithExams(): Promise<ExamCategoryWithExamsDto[]> {
     return this.service.getAllCategoriesWithExams();
@@ -50,6 +51,4 @@ export class ExamCategoryController extends PublicBaseController {
   async delete(@Param("id") id: string): Promise<DeleteResult> {
     return this.service.delete(id);
   }
-  
-
 }

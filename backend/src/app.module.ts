@@ -15,6 +15,7 @@ import { ClassModule } from "./modules/class/class.module";
 import { QuestionTypeModule } from "./modules/question-type/question-type.module";
 import { ChapterModule } from "./modules/chapter/chapter.module";
 import { PermissionManagerModule } from "./modules/permission/permission-manager.module";
+import { FileUploadModule } from "./modules/file-upload/file-upload.module";
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { PermissionManagerModule } from "./modules/permission/permission-manager
     ChapterModule,
     QuestionTypeModule,
     PermissionManagerModule,
+    FileUploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

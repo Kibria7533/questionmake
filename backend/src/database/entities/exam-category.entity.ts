@@ -10,6 +10,15 @@ export class ExamCategoryEntity {
   @Column()
   name: string;
 
+  @Column({ nullable: true })
+  description: string;
+
+  @Column({ nullable: true })
+  feedback: string;
+
+  @Column({ nullable: true })
+  logo_path: string;
+
   @OneToMany(() => ExamEntity, (exam) => exam.category)
   exams: ExamEntity[];
 }

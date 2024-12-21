@@ -1,3 +1,6 @@
+import { applyDecorators } from "@nestjs/common";
+import { ApiBody, ApiConsumes } from "@nestjs/swagger";
+
 export const enumToString = (data: any, excludeValues?: any[]): string => {
   const enumToArrayObject: any = Object?.keys(data)
     ?.filter((key) => isNaN(Number(key)))
@@ -24,3 +27,21 @@ export const formatBdMobileNumber = (number: string): string => {
     return null;
   }
 };
+
+export function ApiFileUpload(fieldName: string = "file", required: boolean = false): any | any[] {
+  return applyDecorators(
+    ApiConsumes("multipart/form-data"),
+    ApiBody({
+      schema: {
+        type: "object",
+        required: required ? [fieldName] : [],
+        properties: {
+          [fieldName]: {
+            type: "string",
+            format: "binary",
+          },
+        },
+      },
+    }),
+  );
+}

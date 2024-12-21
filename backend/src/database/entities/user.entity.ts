@@ -21,6 +21,9 @@ export class UserEntity {
   @Column({ select: false })
   password: string;
 
+  @Column({ nullable: true })
+  profile_path: string;
+
   @Column({ type: "date" })
   dob: string;
 

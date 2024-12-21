@@ -48,25 +48,22 @@ export class ExamCategoryService {
 
   async isCategoryNameExist(name: string, id?: number): Promise<boolean> {
     const isExist: ExamCategoryEntity = await this.repository.isCategoryNameExist(name, id);
-    console.log(isExist);
     return !!isExist;
   }
 
   async delete(id: string): Promise<DeleteResult> {
     return this.repository.delete(id);
   }
-  
+
   async getAllCategoriesWithExams(): Promise<ExamCategoryWithExamsDto[]> {
     const categories = await this.repository.getAllWithExams();
-    return categories.map(category => ({
+    return categories.map((category) => ({
       id: category.id,
       name: category.name,
-      exams: category.exams.map(exam => ({
+      exams: category.exams.map((exam) => ({
         id: exam.id,
         name: exam.name,
       })),
     }));
   }
-  
-  
 }

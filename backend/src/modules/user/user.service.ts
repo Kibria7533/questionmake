@@ -8,6 +8,8 @@ import { Role } from "../../config/enum";
 import { ChangeRoleDto } from "./dto/change-role.dto";
 import { RoleService } from "../permission/role/role.service";
 import { PermissionEntity } from "../../database/entities/permission.entity";
+import { AuthUser } from "../../config/alc";
+import { UpdateUserDto } from "./dto/update-user.dto";
 
 @Injectable()
 export class UserService {
@@ -33,6 +35,21 @@ export class UserService {
     let user: UserEntity = this.userRepository.create(reqDto);
     user.role = Role.REGULAR;
 
+    user = await this.userRepository.save(user);
+
+    user.password = undefined;
+    user.role = undefined;
+    return user;
+  }
+
+  async update(id: number, reqDto: UpdateUserDto): Promise<UserEntity> {
+    const isExist: UserEntity = await this.getOneByMobile(reqDto.mobile);
+
+    if (isExist?.id && id != isExist.id) {
+      throw new BadRequestException("User already exists");
+    }
+
+    let user: UserEntity = this.userRepository.create(reqDto);
     user = await this.userRepository.save(user);
 
     user.password = undefined;
@@ -72,6 +89,15 @@ export class UserService {
   }
 
   async getOneById(id: number): Promise<UserEntity> {
-    return this.userRepository.getOneById(id);
+    const user: UserEntity = await this.userRepository.getOneById(id);
+    if (user) {
+      user.permissions = await this.roleService.getPermissionsByRoleId(user.role);
+    }
+    return user;
+  }
+
+  async getProfile(): Promise<UserEntity> {
+    const authUser: UserEntity = AuthUser.get();
+    return this.userRepository.getOneById(authUser.id);
   }
 }

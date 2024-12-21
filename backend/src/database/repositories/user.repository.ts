@@ -18,7 +18,10 @@ export class UserRepository extends Repository<UserEntity> {
   }
 
   async getOneById(id: number): Promise<UserEntity> {
-    return this.findOne({ where: { id }, select: ["id", "name", "mobile", "email", "role"] });
+    return this.createQueryBuilder("users")
+      .select(["users.id", "users.name", "users.mobile", "users.email", "users.role"])
+      .where("users.id = :id", { id })
+      .getOne();
   }
 
   async getOneByMobile(mobile: string): Promise<UserEntity> {

@@ -1,5 +1,5 @@
-import { IsDateString, IsEmail, IsMobilePhone, IsNotEmpty, IsString } from "class-validator";
-import { ApiProperty } from "@nestjs/swagger";
+import { IsDateString, IsEmail, IsMobilePhone, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Gender } from "../../../config/enum";
 import { enumToString, formatBdMobileNumber } from "../../../config/utils";
 import { IsNumeric } from "../../../config/validations/is-number-string.validator";
@@ -38,6 +38,11 @@ export class CreateUserDto {
   @IsString()
   @ApiProperty({ type: String, default: "1234" })
   confirm_password: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional({ type: String })
+  profile_path: string;
 
   @IsNotEmpty()
   @IsDateString()
