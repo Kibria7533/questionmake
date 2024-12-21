@@ -60,6 +60,7 @@ export class ExamCategoryService {
     return categories.map((category) => ({
       id: category.id,
       name: category.name,
+      logo_path: category.logo_path,
       exams: category.exams.map((exam) => ({
         id: exam.id,
         name: exam.name,

@@ -1,46 +1,55 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
+// Axios instance
+const axiosInstance = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 // Thunks for API interactions
 export const fetchExamCategories = createAsyncThunk(
   "examCategory/fetchExamCategories",
   async () => {
-    const response = await fetch(`${BASE_URL}/exam-category`);
-    const data = await response.json();
-    return data;
+    const response = await axiosInstance.get("/exam-category");
+    return response.data; // Axios returns the data directly
   }
 );
 
 export const addExamCategory = createAsyncThunk(
   "examCategory/addExamCategory",
   async (formData) => {
-    const response = await fetch(`${BASE_URL}/exam-category`, {
-      method: "POST",
-      body: formData, // FormData includes all fields and the logo file
+    console.log("formData", formData);
+    const response = await axiosInstance.post("/exam-category", formData, {
+      headers: {
+        "Content-Type": "application/json", // Ensure proper handling of FormData
+      },
     });
-    const data = await response.json();
-    return data;
+    return response.data;
   }
 );
 
 export const updateExamCategory = createAsyncThunk(
   "examCategory/updateExamCategory",
   async (formData) => {
-    const id = formData.get("id");
-    const response = await fetch(`${BASE_URL}/exam-category/${id}`, {
-      method: "PUT",
-      body: formData, // FormData includes updated fields and the logo file
+    const {id } = formData;
+    const response = await axiosInstance.put(`/exam-category/${id}`, formData, {
+      headers: {
+        "Content-Type": "application/json", // Ensure proper handling of FormData
+      },
     });
-    const data = await response.json();
-    return data;
+    return response.data;
   }
 );
 
 export const deleteExamCategory = createAsyncThunk(
   "examCategory/deleteExamCategory",
   async (id) => {
-    await fetch(`${BASE_URL}/exam-category/${id}`, { method: "DELETE" });
+    await axiosInstance.delete(`/exam-category/${id}`);
     return id;
   }
 );

@@ -55,7 +55,7 @@ const CertificationProviders = () => {
         setProviders(
           data.map(category => ({
             name: category.name,
-            logo: `https://via.placeholder.com/150?text=${category.name}`, // Replace with actual logo URLs
+            logo: `${BASE_URL}/file-upload/view-file/${category.logo_path}`, // Replace with actual logo URLs
             exams: category.exams.map(exam => ({
               id: exam.id,
               name: exam.name,

@@ -9,21 +9,21 @@ import {
   updateExamCategory,
   deleteExamCategory,
 } from "../redux/examCategorySlice";
+import { Modal, Button, Form } from "react-bootstrap";
 
 const ExamCategorySettings = () => {
   const dispatch = useDispatch();
-  const { categories, loading } = useSelector((state) => state.examCategory);
+  const { categories = [], loading } = useSelector((state) => state.examCategory);
 
   const [newCategory, setNewCategory] = useState({
     name: "",
     description: "",
     feedback: "",
     logoPath: "",
-    logoFile: null,
   });
 
   const [editCategory, setEditCategory] = useState(null);
-  const [viewCategory, setViewCategory] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   useEffect(() => {
     dispatch(fetchExamCategories());
@@ -41,19 +41,13 @@ const ExamCategorySettings = () => {
           body: formData,
         }
       );
+
       if (!response.ok) {
         throw new Error("Failed to upload logo.");
       }
-     // Parse plain text response
-    const filePath = await response.text();
-    console.log("Uploaded File Path:", filePath); // Debugging
 
-    // Ensure the response is not empty
-    if (!filePath) {
-      throw new Error("File upload response is empty.");
-    }
-
-    return filePath.trim(); // Ensure no leading/trailing spaces
+      const filePath = await response.text();
+      return filePath.trim();
     } catch (error) {
       console.error("Error uploading logo:", error);
       alert("Failed to upload logo. Please try again.");
@@ -68,13 +62,11 @@ const ExamCategorySettings = () => {
 
     let logoPath = newCategory.logoPath;
 
-    // Upload the logo file if provided
     if (newCategory.logoFile) {
       logoPath = await uploadLogo(newCategory.logoFile);
-      console.log("logopath",logoPath)
       if (!logoPath) return;
     }
-    console.log("logopathggggggggggg",logoPath)
+
     const categoryData = {
       name: newCategory.name,
       description: newCategory.description,
@@ -82,13 +74,11 @@ const ExamCategorySettings = () => {
       logo_path: logoPath,
     };
 
-    console.log("categoryData",categoryData)
-    // Dispatch the add category action
     dispatch(addExamCategory(categoryData))
       .unwrap()
       .then(() => {
         alert("Exam category added successfully!");
-        setNewCategory({ name: "", description: "", feedback: "", logoPath: "", logoFile: null });
+        setNewCategory({ name: "", description: "", feedback: "", logoPath: "" });
       })
       .catch((error) => {
         console.error("Error adding category:", error);
@@ -103,7 +93,6 @@ const ExamCategorySettings = () => {
 
     let logoPath = editCategory.logo_path;
 
-    // Upload a new logo file if provided
     if (editCategory.logo) {
       logoPath = await uploadLogo(editCategory.logo);
       if (!logoPath) return;
@@ -121,6 +110,7 @@ const ExamCategorySettings = () => {
       .unwrap()
       .then(() => {
         alert("Exam category updated successfully!");
+        setShowEditModal(false);
         setEditCategory(null);
       })
       .catch((error) => {
@@ -185,7 +175,7 @@ const ExamCategorySettings = () => {
 
       {loading ? (
         <p>Loading categories...</p>
-      ) : (
+      ) : categories.length > 0 ? (
         <table className="table table-bordered">
           <thead className="bg-primary text-white">
             <tr>
@@ -205,7 +195,7 @@ const ExamCategorySettings = () => {
                 <td>
                   {category.logo_path && (
                     <img
-                      src={`${process.env.NEXT_PUBLIC_API_URL}/${category.logo_path}`}
+                      src={`${process.env.NEXT_PUBLIC_API_URL}/file-upload/view-file/${category.logo_path}`}
                       alt="Category Logo"
                       style={{ width: "50px", height: "50px" }}
                     />
@@ -213,14 +203,11 @@ const ExamCategorySettings = () => {
                 </td>
                 <td>
                   <button
-                    className="btn btn-info me-2"
-                    onClick={() => setViewCategory(category)}
-                  >
-                    View
-                  </button>
-                  <button
                     className="btn btn-warning me-2"
-                    onClick={() => setEditCategory(category)}
+                    onClick={() => {
+                      setEditCategory(category);
+                      setShowEditModal(true);
+                    }}
                   >
                     Edit
                   </button>
@@ -235,9 +222,72 @@ const ExamCategorySettings = () => {
             ))}
           </tbody>
         </table>
+      ) : (
+        <p>No categories available.</p>
       )}
 
-      {/* View and Edit Modals (same as your previous implementation) */}
+      {/* Edit Modal */}
+      {editCategory && (
+        <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Edit Exam Category</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form>
+              <Form.Group className="mb-3">
+                <Form.Label>Category Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={editCategory.name}
+                  onChange={(e) =>
+                    setEditCategory({ ...editCategory, name: e.target.value })
+                  }
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Description</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  value={editCategory.description}
+                  onChange={(e) =>
+                    setEditCategory({
+                      ...editCategory,
+                      description: e.target.value,
+                    })
+                  }
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Feedback</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={editCategory.feedback}
+                  onChange={(e) =>
+                    setEditCategory({ ...editCategory, feedback: e.target.value })
+                  }
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Upload Logo</Form.Label>
+                <Form.Control
+                  type="file"
+                  onChange={(e) =>
+                    setEditCategory({ ...editCategory, logo: e.target.files[0] })
+                  }
+                />
+              </Form.Group>
+            </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleUpdateExamCategory}>
+              Save Changes
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      )}
     </div>
   );
 };

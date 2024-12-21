@@ -17,6 +17,7 @@ export class ExamCategoryController extends PublicBaseController {
   @ApiConsumes("application/json", `application/x-www-form-urlencoded`)
   @ApiProduces("application/json")
   async create(@Body() reqDto: CreateExamCategoryDto): Promise<ExamCategoryEntity> {
+    console.log("reqDto-------------------",reqDto)
     return this.service.create(reqDto);
   }
 
