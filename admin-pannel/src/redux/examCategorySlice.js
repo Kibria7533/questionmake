@@ -14,11 +14,10 @@ export const fetchExamCategories = createAsyncThunk(
 
 export const addExamCategory = createAsyncThunk(
   "examCategory/addExamCategory",
-  async (newCategory) => {
+  async (formData) => {
     const response = await fetch(`${BASE_URL}/exam-category`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: newCategory }),
+      body: formData, // FormData includes all fields and the logo file
     });
     const data = await response.json();
     return data;
@@ -27,11 +26,11 @@ export const addExamCategory = createAsyncThunk(
 
 export const updateExamCategory = createAsyncThunk(
   "examCategory/updateExamCategory",
-  async ({ id, name }) => {
+  async (formData) => {
+    const id = formData.get("id");
     const response = await fetch(`${BASE_URL}/exam-category/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name }),
+      body: formData, // FormData includes updated fields and the logo file
     });
     const data = await response.json();
     return data;
@@ -71,11 +70,23 @@ const examCategorySlice = createSlice({
         state.error = action.error.message;
       })
       // Add Category
+      .addCase(addExamCategory.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(addExamCategory.fulfilled, (state, action) => {
+        state.loading = false;
         state.categories.push(action.payload);
       })
+      .addCase(addExamCategory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
       // Update Category
+      .addCase(updateExamCategory.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(updateExamCategory.fulfilled, (state, action) => {
+        state.loading = false;
         const index = state.categories.findIndex(
           (category) => category.id === action.payload.id
         );
@@ -83,11 +94,23 @@ const examCategorySlice = createSlice({
           state.categories[index] = action.payload;
         }
       })
+      .addCase(updateExamCategory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
       // Delete Category
+      .addCase(deleteExamCategory.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(deleteExamCategory.fulfilled, (state, action) => {
+        state.loading = false;
         state.categories = state.categories.filter(
           (category) => category.id !== action.payload
         );
+      })
+      .addCase(deleteExamCategory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
       });
   },
 });

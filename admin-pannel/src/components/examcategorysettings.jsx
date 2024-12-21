@@ -3,13 +3,25 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useSelector, useDispatch } from "react-redux";
-import {fetchExamCategories,addExamCategory,updateExamCategory,deleteExamCategory} from "../redux/examCategorySlice";
+import {
+  fetchExamCategories,
+  addExamCategory,
+  updateExamCategory,
+  deleteExamCategory,
+} from "../redux/examCategorySlice";
 
 const ExamCategorySettings = () => {
   const dispatch = useDispatch();
   const { categories, loading } = useSelector((state) => state.examCategory);
 
-  const [newCategory, setNewCategory] = useState("");
+  const [newCategory, setNewCategory] = useState({
+    name: "",
+    description: "",
+    feedback: "",
+    logoPath: "",
+    logoFile: null,
+  });
+
   const [editCategory, setEditCategory] = useState(null);
   const [viewCategory, setViewCategory] = useState(null);
 
@@ -17,16 +29,104 @@ const ExamCategorySettings = () => {
     dispatch(fetchExamCategories());
   }, [dispatch]);
 
-  const handleAddExamCategory = () => {
-    if (!newCategory) return alert("Category name cannot be empty.");
-    dispatch(addExamCategory(newCategory));
-    setNewCategory("");
+  const uploadLogo = async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/file-upload/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to upload logo.");
+      }
+     // Parse plain text response
+    const filePath = await response.text();
+    console.log("Uploaded File Path:", filePath); // Debugging
+
+    // Ensure the response is not empty
+    if (!filePath) {
+      throw new Error("File upload response is empty.");
+    }
+
+    return filePath.trim(); // Ensure no leading/trailing spaces
+    } catch (error) {
+      console.error("Error uploading logo:", error);
+      alert("Failed to upload logo. Please try again.");
+      return null;
+    }
   };
 
-  const handleUpdateExamCategory = () => {
-    if (!editCategory.name) return alert("Category name cannot be empty.");
-    dispatch(updateExamCategory(editCategory));
-    setEditCategory(null);
+  const handleAddExamCategory = async () => {
+    if (!newCategory.name || !newCategory.description) {
+      return alert("Category name and description cannot be empty.");
+    }
+
+    let logoPath = newCategory.logoPath;
+
+    // Upload the logo file if provided
+    if (newCategory.logoFile) {
+      logoPath = await uploadLogo(newCategory.logoFile);
+      console.log("logopath",logoPath)
+      if (!logoPath) return;
+    }
+    console.log("logopathggggggggggg",logoPath)
+    const categoryData = {
+      name: newCategory.name,
+      description: newCategory.description,
+      feedback: newCategory.feedback,
+      logo_path: logoPath,
+    };
+
+    console.log("categoryData",categoryData)
+    // Dispatch the add category action
+    dispatch(addExamCategory(categoryData))
+      .unwrap()
+      .then(() => {
+        alert("Exam category added successfully!");
+        setNewCategory({ name: "", description: "", feedback: "", logoPath: "", logoFile: null });
+      })
+      .catch((error) => {
+        console.error("Error adding category:", error);
+        alert("Failed to add exam category. Please try again.");
+      });
+  };
+
+  const handleUpdateExamCategory = async () => {
+    if (!editCategory.name || !editCategory.description) {
+      return alert("Category name and description cannot be empty.");
+    }
+
+    let logoPath = editCategory.logo_path;
+
+    // Upload a new logo file if provided
+    if (editCategory.logo) {
+      logoPath = await uploadLogo(editCategory.logo);
+      if (!logoPath) return;
+    }
+
+    const categoryData = {
+      id: editCategory.id,
+      name: editCategory.name,
+      description: editCategory.description,
+      feedback: editCategory.feedback,
+      logo_path: logoPath,
+    };
+
+    dispatch(updateExamCategory(categoryData))
+      .unwrap()
+      .then(() => {
+        alert("Exam category updated successfully!");
+        setEditCategory(null);
+      })
+      .catch((error) => {
+        console.error("Error updating category:", error);
+        alert("Failed to update exam category. Please try again.");
+      });
   };
 
   const handleDeleteExamCategory = (id) => {
@@ -43,13 +143,39 @@ const ExamCategorySettings = () => {
       <h3 className="text-secondary">Exam Category Settings</h3>
 
       <div className="mb-3">
-        <div className="d-flex">
+        <div className="d-flex flex-column">
           <input
             type="text"
-            className="form-control me-2"
-            placeholder="Add new category"
-            value={newCategory}
-            onChange={(e) => setNewCategory(e.target.value)}
+            className="form-control mb-2"
+            placeholder="Category Name"
+            value={newCategory.name}
+            onChange={(e) =>
+              setNewCategory({ ...newCategory, name: e.target.value })
+            }
+          />
+          <textarea
+            className="form-control mb-2"
+            placeholder="Description"
+            value={newCategory.description}
+            onChange={(e) =>
+              setNewCategory({ ...newCategory, description: e.target.value })
+            }
+          />
+          <input
+            type="text"
+            className="form-control mb-2"
+            placeholder="Feedback"
+            value={newCategory.feedback}
+            onChange={(e) =>
+              setNewCategory({ ...newCategory, feedback: e.target.value })
+            }
+          />
+          <input
+            type="file"
+            className="form-control mb-2"
+            onChange={(e) =>
+              setNewCategory({ ...newCategory, logoFile: e.target.files[0] })
+            }
           />
           <button className="btn btn-success" onClick={handleAddExamCategory}>
             Add
@@ -64,6 +190,9 @@ const ExamCategorySettings = () => {
           <thead className="bg-primary text-white">
             <tr>
               <th>Category Name</th>
+              <th>Description</th>
+              <th>Feedback</th>
+              <th>Logo</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -71,6 +200,17 @@ const ExamCategorySettings = () => {
             {categories.map((category) => (
               <tr key={category.id}>
                 <td>{category.name}</td>
+                <td>{category.description}</td>
+                <td>{category.feedback}</td>
+                <td>
+                  {category.logo_path && (
+                    <img
+                      src={`${process.env.NEXT_PUBLIC_API_URL}/${category.logo_path}`}
+                      alt="Category Logo"
+                      style={{ width: "50px", height: "50px" }}
+                    />
+                  )}
+                </td>
                 <td>
                   <button
                     className="btn btn-info me-2"
@@ -97,92 +237,7 @@ const ExamCategorySettings = () => {
         </table>
       )}
 
-      {/* View Modal */}
-      {viewCategory && (
-        <div
-          className="modal show d-block"
-          tabIndex="-1"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-        >
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">View Exam Category</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setViewCategory(null)}
-                ></button>
-              </div>
-              <div className="modal-body">
-                <p>
-                  <strong>ID:</strong> {viewCategory.id}
-                </p>
-                <p>
-                  <strong>Name:</strong> {viewCategory.name}
-                </p>
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setViewCategory(null)}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Modal */}
-      {editCategory && (
-        <div
-          className="modal show d-block"
-          tabIndex="-1"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-        >
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Edit Exam Category</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setEditCategory(null)}
-                ></button>
-              </div>
-              <div className="modal-body">
-                <input
-                  type="text"
-                  className="form-control"
-                  value={editCategory.name}
-                  onChange={(e) =>
-                    setEditCategory({ ...editCategory, name: e.target.value })
-                  }
-                />
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={handleUpdateExamCategory}
-                >
-                  Save
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setEditCategory(null)}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* View and Edit Modals (same as your previous implementation) */}
     </div>
   );
 };

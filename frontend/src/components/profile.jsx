@@ -5,14 +5,11 @@ import { useRouter } from "next/navigation";
 
 const Profile = () => {
   const router = useRouter();
-  const [userData, setUserData] = useState({
-    name: "John Doe",
-    email: "johndoe@example.com",
-    member_since: "January 2023",
-    role: "admin", // Default role for testing
-  });
+  const [userData, setUserData] = useState(null); // Initially null to indicate loading state
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const [questions, setQuestions] = useState([
+  const staticQuestions = [
     {
       id: 1,
       title: "What is React?",
@@ -23,7 +20,7 @@ const Profile = () => {
       title: "Explain Event Loop in JavaScript",
       created_at: "2024-04-17T12:15:00Z",
     },
-  ]);
+  ];
 
   const styles = {
     page: {
@@ -78,6 +75,55 @@ const Profile = () => {
     router.push("/createquestion"); // Redirects to /createquestion
   };
 
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+          throw new Error("Token not found. Please log in.");
+        }
+
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+        const profileResponse = await fetch(`${apiUrl}/users/profile`, {
+          headers: {
+            accept: "*/*",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!profileResponse.ok) {
+          throw new Error("Failed to fetch profile");
+        }
+
+        const profileData = await profileResponse.json();
+        setUserData({
+          name: profileData.name,
+          email: profileData.email,
+          member_since: new Date(profileData.created_at).toLocaleString(),
+          role: profileData.role === 1 ? "admin" : "user",
+        });
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  if (loading) {
+    return <div style={styles.page}>Loading...</div>;
+  }
+
+  if (error) {
+    return (
+      <div style={styles.page}>
+        <p style={{ color: "red" }}>Error: {error}</p>
+      </div>
+    );
+  }
+
   return (
     <div style={styles.page}>
       <h1 style={styles.title}>User Profile</h1>
@@ -103,7 +149,7 @@ const Profile = () => {
 
       {/* Table for Question History */}
       <h2 style={{ marginTop: "20px" }}>Your Question History</h2>
-      {questions.length > 0 ? (
+      {staticQuestions.length > 0 ? (
         <table style={styles.table}>
           <thead>
             <tr>
@@ -113,7 +159,7 @@ const Profile = () => {
             </tr>
           </thead>
           <tbody>
-            {questions.map((question, index) => (
+            {staticQuestions.map((question, index) => (
               <tr
                 key={question.id}
                 style={index % 2 === 0 ? styles.rowEven : styles.rowOdd}
