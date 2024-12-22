@@ -48,4 +48,9 @@ export class CreateUserDto {
   @IsDateString()
   @ApiProperty({ type: String, default: "2024-12-12" })
   dob: string;
+
+    @IsOptional()
+    @IsBoolean()
+    @ApiPropertyOptional({ type: Boolean, default: true })
+    status: boolean; // New field for active/inactive status
 }

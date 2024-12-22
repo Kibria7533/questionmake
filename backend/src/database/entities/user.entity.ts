@@ -30,6 +30,9 @@ export class UserEntity {
   @Column({ select: false, comment: enumToString(Role), type: "int", default: Role.REGULAR })
   role: number;
 
+  @Column({ type: "boolean", default: true })
+  status: boolean; // New field with boolean type and default true
+
   // virtual
   permissions: PermissionEntity[];
   permission_keys: string[];
