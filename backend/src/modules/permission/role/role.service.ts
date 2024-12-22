@@ -55,9 +55,10 @@ export class RoleService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
+      console.log(permissions);
+      console.log(id);
       await queryRunner.manager.delete(RolePermissionsEntity, { role_id: id });
       await queryRunner.manager.save(RolePermissionsEntity, permissions);
-      await queryRunner.manager.save(role);
 
       await queryRunner.commitTransaction();
       return role;
@@ -96,11 +97,11 @@ export class RoleService {
     if (!role) {
       throw new BadRequestException("Role not found");
     }
-  
+
     // Fetch permissions for the role
     const permissions = await this.getPermissionsByRoleId(id);
     role.permissions = permissions;
-  
+
     return role;
   }
 

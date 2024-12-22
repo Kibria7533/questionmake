@@ -31,7 +31,7 @@ export class UserEntity {
   role: number;
 
   @Column({ type: "boolean", default: true })
-  status: boolean; // New field with boolean type and default true
+  status?: boolean; // New field with boolean type and default true
 
   // virtual
   permissions: PermissionEntity[];
