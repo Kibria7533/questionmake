@@ -14,6 +14,8 @@ export class RoleEntity {
   @OneToMany(() => RolePermissionsEntity, (role_permission) => role_permission.role)
   role_permissions: RolePermissionsEntity[];
 
+  @Column()
+  roleID: number;
   // virtual
   permissions: PermissionEntity[];
 }

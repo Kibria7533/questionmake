@@ -1,17 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const Users = () => {
-  const token = useSelector((state) => state.user.userData?.token); // Access token from Redux
+  const token = localStorage.getItem("access_token"); // Access token from localStorage
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState("");
   const [editModal, setEditModal] = useState(null);
-  const [allPermissions, setAllPermissions] = useState([]);
+  const [roles, setRoles] = useState([]); // Store available roles
 
   // Fetch users
   const fetchUsers = async () => {
@@ -32,51 +31,55 @@ const Users = () => {
     }
   };
 
-  // Fetch all permissions
-  const fetchAllPermissions = async () => {
+  // Fetch roles from the API
+  const fetchRoles = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/permissions`, {
+      const response = await fetch(`${BASE_URL}/roles`, {
         headers: {
           Authorization: `Bearer ${token}`,
+          Accept: "*/*",
         },
       });
       if (response.ok) {
         const data = await response.json();
-        setAllPermissions(data);
+        setRoles(data);
       } else {
-        alert("Failed to fetch permissions.");
+        alert("Failed to fetch roles.");
       }
     } catch (error) {
-      console.error("Error fetching permissions:", error);
+      console.error("Error fetching roles:", error);
     }
   };
 
-  // Update user permissions
-  const handleUpdatePermissions = async (userId, updatedPermissions) => {
+  // Update user role
+  const handleSaveChanges = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/users/${userId}/permissions`, {
+      const response = await fetch(`${BASE_URL}/users/change-role`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ permissions: updatedPermissions }),
+        body: JSON.stringify({
+          user_id: editModal.id,
+          role: editModal.role,
+        }),
       });
       if (response.ok) {
-        alert("Permissions updated successfully.");
+        alert("User role updated successfully!");
         setEditModal(null);
         fetchUsers(); // Refresh users
       } else {
-        alert("Failed to update permissions.");
+        alert("Failed to update user role.");
       }
     } catch (error) {
-      console.error("Error updating permissions:", error);
+      console.error("Error updating user role:", error);
     }
   };
 
   useEffect(() => {
     fetchUsers();
-    fetchAllPermissions();
+    fetchRoles();
   }, []);
 
   const filteredUsers = users.filter(
@@ -117,7 +120,7 @@ const Users = () => {
                   className="btn btn-info me-2"
                   onClick={() => setEditModal(user)}
                 >
-                  Edit Permissions
+                  Edit
                 </button>
               </td>
             </tr>
@@ -125,17 +128,17 @@ const Users = () => {
         </tbody>
       </table>
 
-      {/* Edit Permissions Modal */}
+      {/* Edit User Modal */}
       {editModal && (
         <div
           className="modal show d-block"
           tabIndex="-1"
           style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
         >
-          <div className="modal-dialog">
+          <div className="modal-dialog modal-lg">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Edit Permissions for {editModal.name}</h5>
+                <h5 className="modal-title">Edit User: {editModal.name}</h5>
                 <button
                   type="button"
                   className="btn-close"
@@ -143,34 +146,81 @@ const Users = () => {
                 ></button>
               </div>
               <div className="modal-body">
-                {allPermissions.length > 0 ? (
-                  <ul>
-                    {allPermissions.map((perm) => (
-                      <li key={perm.id}>
-                        <label>
-                          <input
-                            type="checkbox"
-                            checked={editModal.permissions.some(
-                              (p) => p.id === perm.id
-                            )}
-                            onChange={(e) => {
-                              const updatedPermissions = e.target.checked
-                                ? [...editModal.permissions, perm]
-                                : editModal.permissions.filter((p) => p.id !== perm.id);
-                              setEditModal({
-                                ...editModal,
-                                permissions: updatedPermissions,
-                              });
-                            }}
-                          />{" "}
-                          {perm.name}
-                        </label>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>Loading permissions...</p>
-                )}
+                <form>
+                  {/* User Details */}
+                  <div className="row">
+                    <div className="col-md-6 mb-3">
+                      <label htmlFor="name" className="form-label">
+                        Name
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="name"
+                        value={editModal.name}
+                        disabled
+                      />
+                    </div>
+                    <div className="col-md-6 mb-3">
+                      <label htmlFor="email" className="form-label">
+                        Email
+                      </label>
+                      <input
+                        type="email"
+                        className="form-control"
+                        id="email"
+                        value={editModal.email}
+                        disabled
+                      />
+                    </div>
+                    <div className="col-md-6 mb-3">
+                      <label htmlFor="role" className="form-label">
+                        Role
+                      </label>
+                      <select
+                        className="form-select"
+                        id="role"
+                        value={editModal.role}
+                        onChange={(e) =>
+                          setEditModal({ ...editModal, role: parseInt(e.target.value, 10) })
+                        }
+                      >
+                        <option value="">Select Role</option>
+                        {roles.map((role) => (
+                          <option key={role.id} value={role.id}>
+                            {role.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Permissions */}
+                  <div className="mb-3">
+                    <h5 className="form-label">Permissions</h5>
+                    <div className="row">
+                      {editModal.permissions.map((perm) => (
+                        <div className="col-md-4" key={perm.id}>
+                          <div className="form-check">
+                            <input
+                              className="form-check-input"
+                              type="checkbox"
+                              id={`perm-${perm.id}`}
+                              checked
+                              disabled
+                            />
+                            <label
+                              className="form-check-label"
+                              htmlFor={`perm-${perm.id}`}
+                            >
+                              {perm.name}
+                            </label>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </form>
               </div>
               <div className="modal-footer">
                 <button
@@ -183,12 +233,7 @@ const Users = () => {
                 <button
                   type="button"
                   className="btn btn-primary"
-                  onClick={() =>
-                    handleUpdatePermissions(
-                      editModal.id,
-                      editModal.permissions.map((perm) => perm.id)
-                    )
-                  }
+                  onClick={handleSaveChanges}
                 >
                   Save Changes
                 </button>
