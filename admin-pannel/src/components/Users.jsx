@@ -10,8 +10,8 @@ const Users = () => {
   const token = useSelector((state) => state.user.userData?.token); // Access token from Redux
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState("");
-  const [viewModal, setViewModal] = useState(null);
-  const [permissionsModal, setPermissionsModal] = useState(null);
+  const [editModal, setEditModal] = useState(null);
+  const [allPermissions, setAllPermissions] = useState([]);
 
   // Fetch users
   const fetchUsers = async () => {
@@ -32,17 +32,17 @@ const Users = () => {
     }
   };
 
-  // Fetch user permissions
-  const fetchUserPermissions = async (userId) => {
+  // Fetch all permissions
+  const fetchAllPermissions = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/users/${userId}`, {
+      const response = await fetch(`${BASE_URL}/permissions`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       if (response.ok) {
         const data = await response.json();
-        setPermissionsModal(data.permissions || []); // Assuming the API returns a permissions array
+        setAllPermissions(data);
       } else {
         alert("Failed to fetch permissions.");
       }
@@ -51,30 +51,32 @@ const Users = () => {
     }
   };
 
-  // Delete a user
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this user?");
-    if (!confirmDelete) return;
-
+  // Update user permissions
+  const handleUpdatePermissions = async (userId, updatedPermissions) => {
     try {
-      const response = await fetch(`${BASE_URL}/users/${id}`, {
-        method: "DELETE",
+      const response = await fetch(`${BASE_URL}/users/${userId}/permissions`, {
+        method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({ permissions: updatedPermissions }),
       });
       if (response.ok) {
-        setUsers(users.filter((user) => user.id !== id));
+        alert("Permissions updated successfully.");
+        setEditModal(null);
+        fetchUsers(); // Refresh users
       } else {
-        alert("Failed to delete user.");
+        alert("Failed to update permissions.");
       }
     } catch (error) {
-      console.error("Error deleting user:", error);
+      console.error("Error updating permissions:", error);
     }
   };
 
   useEffect(() => {
     fetchUsers();
+    fetchAllPermissions();
   }, []);
 
   const filteredUsers = users.filter(
@@ -109,25 +111,13 @@ const Users = () => {
               <td>{user.id}</td>
               <td>{user.name}</td>
               <td>{user.email}</td>
-              <td>{user.role}</td>
+              <td>{user.rolename}</td>
               <td>
                 <button
                   className="btn btn-info me-2"
-                  onClick={() => setViewModal(user)}
+                  onClick={() => setEditModal(user)}
                 >
-                  View
-                </button>
-                <button
-                  className="btn btn-secondary me-2"
-                  onClick={() => fetchUserPermissions(user.id)}
-                >
-                  View Permissions
-                </button>
-                <button
-                  className="btn btn-danger"
-                  onClick={() => handleDelete(user.id)}
-                >
-                  Delete
+                  Edit Permissions
                 </button>
               </td>
             </tr>
@@ -135,8 +125,8 @@ const Users = () => {
         </tbody>
       </table>
 
-      {/* View Modal */}
-      {viewModal && (
+      {/* Edit Permissions Modal */}
+      {editModal && (
         <div
           className="modal show d-block"
           tabIndex="-1"
@@ -145,68 +135,62 @@ const Users = () => {
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">View User</h5>
+                <h5 className="modal-title">Edit Permissions for {editModal.name}</h5>
                 <button
                   type="button"
                   className="btn-close"
-                  onClick={() => setViewModal(null)}
+                  onClick={() => setEditModal(null)}
                 ></button>
               </div>
               <div className="modal-body">
-                <p><strong>ID:</strong> {viewModal.id}</p>
-                <p><strong>Name:</strong> {viewModal.name}</p>
-                <p><strong>Email:</strong> {viewModal.email}</p>
-                <p><strong>Role:</strong> {viewModal.role}</p>
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setViewModal(null)}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Permissions Modal */}
-      {permissionsModal && (
-        <div
-          className="modal show d-block"
-          tabIndex="-1"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-        >
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">User Permissions</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setPermissionsModal(null)}
-                ></button>
-              </div>
-              <div className="modal-body">
-                {permissionsModal.length > 0 ? (
+                {allPermissions.length > 0 ? (
                   <ul>
-                    {permissionsModal.map((perm, index) => (
-                      <li key={index}>{perm.name}</li>
+                    {allPermissions.map((perm) => (
+                      <li key={perm.id}>
+                        <label>
+                          <input
+                            type="checkbox"
+                            checked={editModal.permissions.some(
+                              (p) => p.id === perm.id
+                            )}
+                            onChange={(e) => {
+                              const updatedPermissions = e.target.checked
+                                ? [...editModal.permissions, perm]
+                                : editModal.permissions.filter((p) => p.id !== perm.id);
+                              setEditModal({
+                                ...editModal,
+                                permissions: updatedPermissions,
+                              });
+                            }}
+                          />{" "}
+                          {perm.name}
+                        </label>
+                      </li>
                     ))}
                   </ul>
                 ) : (
-                  <p>No permissions assigned to this user.</p>
+                  <p>Loading permissions...</p>
                 )}
               </div>
               <div className="modal-footer">
                 <button
                   type="button"
                   className="btn btn-secondary"
-                  onClick={() => setPermissionsModal(null)}
+                  onClick={() => setEditModal(null)}
                 >
-                  Close
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() =>
+                    handleUpdatePermissions(
+                      editModal.id,
+                      editModal.permissions.map((perm) => perm.id)
+                    )
+                  }
+                >
+                  Save Changes
                 </button>
               </div>
             </div>
