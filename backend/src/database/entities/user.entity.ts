@@ -33,4 +33,5 @@ export class UserEntity {
   // virtual
   permissions: PermissionEntity[];
   permission_keys: string[];
+  rolename?: string;
 }

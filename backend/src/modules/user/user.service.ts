@@ -69,9 +69,19 @@ export class UserService {
     return user;
   }
 
-  async getAll(): Promise<UserEntity[]> {
-    return this.userRepository.getAll();
+async getAll(): Promise<UserEntity[]> {
+  const users = await this.userRepository.getAll();
+  for (const user of users) {
+    if (user.role !== undefined) {
+      // Fetch the role details using RoleService
+      const roleDetails = await this.roleService.getOneById(user.role);
+      user.rolename = roleDetails.name;
+      user.permissions = roleDetails.permissions; // Assuming roleDetails has permissions
+    }
   }
+
+  return users;
+}
 
   async getAuthUser(sub: number): Promise<UserEntity> {
     const user: UserEntity = await this.userRepository.getAuthUser(sub);
@@ -91,7 +101,9 @@ export class UserService {
   async getOneById(id: number): Promise<UserEntity> {
     const user: UserEntity = await this.userRepository.getOneById(id);
     if (user) {
-      user.permissions = await this.roleService.getPermissionsByRoleId(user.role);
+            const roleDetails = await this.roleService.getOneById(user.role);
+            user.rolename = roleDetails.name;
+            user.permissions = roleDetails.permissions; // Assuming roleDetails has permissions
     }
     return user;
   }

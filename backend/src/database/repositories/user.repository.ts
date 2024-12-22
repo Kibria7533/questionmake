@@ -10,7 +10,7 @@ export class UserRepository extends Repository<UserEntity> {
   }
 
   async getAll(): Promise<UserEntity[]> {
-    return this.find({ select: ["id", "name", "mobile", "email", "dob"] });
+    return this.find({ select: ["id", "name", "mobile", "email", "dob","role"] });
   }
 
   async getAuthUser(sub: number): Promise<UserEntity> {
