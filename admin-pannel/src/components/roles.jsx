@@ -46,11 +46,15 @@ const Roles = () => {
       if (response.ok) {
         const data = await response.json();
         // Group permissions by module
-        const groupedPermissions = data.reduce((acc, perm) => {
-          if (!acc[perm.module_id]) acc[perm.module_id] = [];
-          acc[perm.module_id].push(perm);
-          return acc;
-        }, {});
+       const groupedPermissions = data.reduce((acc, perm) => {
+       const moduleId = perm.module_id;
+
+       if (!acc[moduleId]) {
+         acc[moduleId] = { module_name: perm.module_name, permissions: [] };
+          }
+        acc[moduleId].permissions.push(perm);
+  return acc;
+}, {});
         setPermissionsByModule(groupedPermissions);
       } else {
         alert("Failed to fetch permissions.");
@@ -353,11 +357,11 @@ const Roles = () => {
           >
             <h3>Manage Permissions for Role ID: {selectedRoleId}</h3>
             {Object.entries(permissionsByModule).map(
-              ([moduleId, permissions]) => (
-                <div key={moduleId}>
-                  <h4>Module {moduleId}</h4>
+              ([moduleId, moduleData]) => (
+                <div key={moduleData.module_name}>
+                  <h4>Module {moduleData.module_name}</h4>
                   <div>
-                    {permissions.map((perm) => (
+                    {moduleData.permissions.map((perm) => (
                       <div key={perm.id}>
                         <label>
                           <input
