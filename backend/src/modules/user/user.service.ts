@@ -33,7 +33,7 @@ export class UserService {
     reqDto.password = await bcrypt.hash(reqDto.password, HASH_ROUND);
 
     let user: UserEntity = this.userRepository.create(reqDto);
-    user.role = Role.REGULAR;
+   
 
     user = await this.userRepository.save(user);
 

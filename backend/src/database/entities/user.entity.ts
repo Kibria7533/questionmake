@@ -27,7 +27,7 @@ export class UserEntity {
   @Column({ type: "date" })
   dob: string;
 
-  @Column({ select: false, comment: enumToString(Role), type: "int", default: Role.REGULAR })
+  @Column({ select: false, nullable: true })
   role: number;
 
   @Column({ type: "boolean", default: true })
