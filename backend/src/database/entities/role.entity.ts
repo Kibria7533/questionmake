@@ -15,7 +15,8 @@ export class RoleEntity {
   role_permissions: RolePermissionsEntity[];
 
   @Column()
-  roleID: number;
+  role_id: number;
+
   // virtual
   permissions: PermissionEntity[];
 }

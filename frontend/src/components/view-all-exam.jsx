@@ -1,8 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
+import Link from "next/link";
+// import "bootstrap/dist/css/bootstrap.min.css";
+
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
 const ViewAllExams = () => {
   const [providers, setProviders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -41,6 +44,8 @@ const ViewAllExams = () => {
       boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
       textAlign: "center",
       transition: "transform 0.3s ease",
+      cursor: "pointer",
+      textDecoration: "none",
     },
     providerCardHover: {
       transform: "scale(1.03)",
@@ -66,7 +71,8 @@ const ViewAllExams = () => {
         }
         const data = await response.json();
         setProviders(
-          data.map(category => ({
+          data.map((category) => ({
+            id: category.id,
             name: category.name,
             exams: category.exams.length,
           }))
@@ -97,19 +103,22 @@ const ViewAllExams = () => {
       </p>
 
       <div style={styles.gridContainer}>
-        {providers.map((provider, index) => (
-          <div
-            key={index}
-            className="provider-card"
+        {providers.map((provider) => (
+          <Link
+            key={provider.id}
+            href={`/exam-list/${provider.id}`}
             style={styles.providerCard}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.transform = styles.providerCardHover.transform)
-            }
-            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
           >
-            <div style={styles.providerName}>{provider.name}</div>
-            <div style={styles.examCount}>({provider.exams} exams)</div>
-          </div>
+            <div
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.transform = styles.providerCardHover.transform)
+              }
+              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+            >
+              <div style={styles.providerName}>{provider.name}</div>
+              <div style={styles.examCount}>({provider.exams} exams)</div>
+            </div>
+          </Link>
         ))}
       </div>
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
+// import "bootstrap/dist/css/bootstrap.min.css";
 import { FaQuoteLeft } from "react-icons/fa";
 
 // Dummy testimonials data

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
+// import "bootstrap/dist/css/bootstrap.min.css";
 
 const CounterSection = () => {
   const counters = [
@@ -80,10 +80,9 @@ const CounterSection = () => {
 
   return (
     <div style={styles.section}>
-      <h2 style={styles.header}>QuestionHat</h2>
+      <h2 style={styles.header}>প্রশ্নের হাট</h2>
       <p style={styles.subHeader}>
-        The only source for free & accurate actual exam questions & answers,
-        passing your exam easily is guaranteed, and for free!
+      বিনামূল্যে এবং সঠিক প্রকৃত পরীক্ষার প্রশ্ন ও উত্তরের একমাত্র উৎস, সহজেই আপনার পরীক্ষায় পাস করা নিশ্চিত, এবং বিনামূল্যে!
       </p>
       <div style={styles.cardContainer}>
         {counters.map((counter, index) => (

@@ -1,12 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const Users = () => {
-  const token = localStorage.getItem("access_token"); // Access token from localStorage
+  const [token, setToken] = useState(null); // State to store token
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState("");
   const [editModal, setEditModal] = useState(null);
@@ -14,6 +13,8 @@ const Users = () => {
 
   // Fetch users
   const fetchUsers = async () => {
+    if (!token) return;
+
     try {
       const response = await fetch(`${BASE_URL}/users`, {
         headers: {
@@ -33,6 +34,8 @@ const Users = () => {
 
   // Fetch roles from the API
   const fetchRoles = async () => {
+    if (!token) return;
+
     try {
       const response = await fetch(`${BASE_URL}/roles`, {
         headers: {
@@ -48,6 +51,32 @@ const Users = () => {
       }
     } catch (error) {
       console.error("Error fetching roles:", error);
+    }
+  };
+
+  // Toggle user status (Activate/Deactivate)
+  const handleToggleStatus = async (id, currentStatus) => {
+    try {
+      const response = await fetch(`${BASE_URL}/users/${id}/status`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: !currentStatus }), // Toggle status
+      });
+      if (response.ok) {
+        const updatedUser = await response.json();
+        setUsers(
+          users.map((user) =>
+            user.id === updatedUser.id ? updatedUser : user
+          )
+        );
+      } else {
+        alert("Failed to toggle user status.");
+      }
+    } catch (error) {
+      console.error("Error toggling user status:", error);
     }
   };
 
@@ -77,10 +106,21 @@ const Users = () => {
     }
   };
 
+  // Load token on client side
   useEffect(() => {
-    fetchUsers();
-    fetchRoles();
+    if (typeof window !== "undefined") {
+      const storedToken = localStorage.getItem("access_token");
+      setToken(storedToken);
+    }
   }, []);
+
+  // Fetch users and roles when token is available
+  useEffect(() => {
+    if (token) {
+      fetchUsers();
+      fetchRoles();
+    }
+  }, [token]);
 
   const filteredUsers = users.filter(
     (user) =>
@@ -105,6 +145,7 @@ const Users = () => {
             <th>Name</th>
             <th>Email</th>
             <th>Role</th>
+            <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -115,6 +156,7 @@ const Users = () => {
               <td>{user.name}</td>
               <td>{user.email}</td>
               <td>{user.rolename}</td>
+              <td>{user.status ? "Active" : "Inactive"}</td>
               <td>
                 <button
                   className="btn btn-info me-2"
@@ -122,126 +164,19 @@ const Users = () => {
                 >
                   Edit
                 </button>
+                <button
+                  className={`btn ${
+                    user.status ? "btn-danger" : "btn-success"
+                  }`}
+                  onClick={() => handleToggleStatus(user.id, user.status)}
+                >
+                  {user.status ? "Deactivate" : "Activate"}
+                </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-
-      {/* Edit User Modal */}
-      {editModal && (
-        <div
-          className="modal show d-block"
-          tabIndex="-1"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-        >
-          <div className="modal-dialog modal-lg">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Edit User: {editModal.name}</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setEditModal(null)}
-                ></button>
-              </div>
-              <div className="modal-body">
-                <form>
-                  {/* User Details */}
-                  <div className="row">
-                    <div className="col-md-6 mb-3">
-                      <label htmlFor="name" className="form-label">
-                        Name
-                      </label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="name"
-                        value={editModal.name}
-                        disabled
-                      />
-                    </div>
-                    <div className="col-md-6 mb-3">
-                      <label htmlFor="email" className="form-label">
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        className="form-control"
-                        id="email"
-                        value={editModal.email}
-                        disabled
-                      />
-                    </div>
-                    <div className="col-md-6 mb-3">
-                      <label htmlFor="role" className="form-label">
-                        Role
-                      </label>
-                      <select
-                        className="form-select"
-                        id="role"
-                        value={editModal.role}
-                        onChange={(e) =>
-                          setEditModal({ ...editModal, role: parseInt(e.target.value, 10) })
-                        }
-                      >
-                        <option value="">Select Role</option>
-                        {roles.map((role) => (
-                          <option key={role.id} value={role.id}>
-                            {role.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Permissions */}
-                  <div className="mb-3">
-                    <h5 className="form-label">Permissions</h5>
-                    <div className="row">
-                      {editModal.permissions.map((perm) => (
-                        <div className="col-md-4" key={perm.id}>
-                          <div className="form-check">
-                            <input
-                              className="form-check-input"
-                              type="checkbox"
-                              id={`perm-${perm.id}`}
-                              checked
-                              disabled
-                            />
-                            <label
-                              className="form-check-label"
-                              htmlFor={`perm-${perm.id}`}
-                            >
-                              {perm.name}
-                            </label>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </form>
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setEditModal(null)}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={handleSaveChanges}
-                >
-                  Save Changes
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

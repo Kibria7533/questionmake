@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const Roles = () => {
-  const token = localStorage.getItem("access_token"); // Access token from localStorage
+  const [token, setToken] = useState(null); // Access token from localStorage
   const [roles, setRoles] = useState([]);
   const [permissionsByModule, setPermissionsByModule] = useState({});
   const [selectedRolePermissions, setSelectedRolePermissions] = useState([]);
@@ -78,7 +78,7 @@ const Roles = () => {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name: newRoleName, roleID: parseInt(newRoleID, 10) }),
+        body: JSON.stringify({ name: newRoleName, role_id: parseInt(newRoleID, 10) }),
       });
 
       if (response.ok) {
@@ -96,13 +96,13 @@ const Roles = () => {
   };
 
   // Delete a role
-  const deleteRole = async (roleId) => {
+  const deleteRole = async (role_id) => {
     if (!window.confirm("Are you sure you want to delete this role?")) {
       return;
     }
 
     try {
-      const response = await fetch(`${BASE_URL}/roles/${roleId}`, {
+      const response = await fetch(`${BASE_URL}/roles/${role_id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -110,7 +110,7 @@ const Roles = () => {
       });
 
       if (response.ok) {
-        setRoles(roles.filter((role) => role.id !== roleId));
+        setRoles(roles.filter((role) => role.id !== role_id));
         alert("Role deleted successfully!");
       } else {
         alert("Failed to delete role.");
@@ -132,7 +132,7 @@ const Roles = () => {
 
   // Save edited role
   const saveEditedRole = async () => {
-    if (!editingRole.name.trim() || !editingRole.roleID) {
+    if (!editingRole.name.trim() || !editingRole.role_id) {
       alert("Role name and Role ID are required.");
       return;
     }
@@ -146,7 +146,7 @@ const Roles = () => {
         },
         body: JSON.stringify({
           name: editingRole.name,
-          roleID: parseInt(editingRole.roleID, 10),
+          role_id: parseInt(editingRole.role_id, 10),
         }),
       });
 
@@ -168,10 +168,10 @@ const Roles = () => {
   };
 
   // Open permissions modal
-  const openPermissionModal = (permissions, roleId) => {
+  const openPermissionModal = (permissions, role_id) => {
     setSelectedRolePermissions(permissions.map((perm) => perm.id)); // Store assigned permissions
     setPendingPermissions(permissions.map((perm) => perm.id)); // Initialize pending changes
-    setSelectedRoleId(roleId);
+    setSelectedRoleId(role_id);
     setIsPermissionModalOpen(true);
   };
 
@@ -215,10 +215,21 @@ const Roles = () => {
     }
   };
 
+         // Load token on client side
+         useEffect(() => {
+          if (typeof window !== "undefined") {
+            const storedToken = localStorage.getItem("access_token");
+            setToken(storedToken);
+          }
+        }, []);
+
   useEffect(() => {
-    fetchRoles();
-    fetchPermissions();
-  }, []);
+    if(token){
+      fetchRoles();
+      fetchPermissions();
+    }
+
+  }, [token]);
 
   return (
     <div>
@@ -256,7 +267,7 @@ const Roles = () => {
             <tr key={role.id}>
               <td>{role.id}</td>
               <td>{role.name}</td>
-              <td>{role.roleID}</td>
+              <td>{role.role_id}</td>
               <td>
                 <button onClick={() => openEditModal(role)}>Edit</button>
                 <button onClick={() => deleteRole(role.id)}>Delete</button>
@@ -308,11 +319,11 @@ const Roles = () => {
               <label>Role ID</label>
               <input
                 type="text"
-                value={editingRole.roleID}
+                value={editingRole.role_id}
                 onChange={(e) =>
                   setEditingRole({
                     ...editingRole,
-                    roleID: parseInt(e.target.value, 10),
+                    role_id: parseInt(e.target.value, 10),
                   })
                 }
                 style={{ width: "100%", padding: "8px", marginTop: "5px" }}

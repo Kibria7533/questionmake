@@ -69,19 +69,19 @@ export class UserService {
     return user;
   }
 
-async getAll(): Promise<UserEntity[]> {
-  const users = await this.userRepository.getAll();
-  for (const user of users) {
-    if (user.role !== undefined) {
-      // Fetch the role details using RoleService
-      const roleDetails = await this.roleService.getOneById(user.role);
-      user.rolename = roleDetails.name;
-      user.permissions = roleDetails.permissions; // Assuming roleDetails has permissions
+  async getAll(): Promise<UserEntity[]> {
+    const users = await this.userRepository.getAll();
+    for (const user of users) {
+      if (user.role !== undefined) {
+        // Fetch the role details using RoleService
+        const roleDetails = await this.roleService.getOneById(user.role);
+        user.rolename = roleDetails.name;
+        user.permissions = roleDetails.permissions; // Assuming roleDetails has permissions
+      }
     }
-  }
 
-  return users;
-}
+    return users;
+  }
 
   async getAuthUser(sub: number): Promise<UserEntity> {
     const user: UserEntity = await this.userRepository.getAuthUser(sub);
@@ -101,9 +101,9 @@ async getAll(): Promise<UserEntity[]> {
   async getOneById(id: number): Promise<UserEntity> {
     const user: UserEntity = await this.userRepository.getOneById(id);
     if (user) {
-            const roleDetails = await this.roleService.getOneById(user.role);
-            user.rolename = roleDetails.name;
-            user.permissions = roleDetails.permissions; // Assuming roleDetails has permissions
+      const roleDetails = await this.roleService.getOneById(user.role);
+      user.rolename = roleDetails.name;
+      user.permissions = roleDetails.permissions; // Assuming roleDetails has permissions
     }
     return user;
   }
@@ -112,4 +112,19 @@ async getAll(): Promise<UserEntity[]> {
     const authUser: UserEntity = AuthUser.get();
     return this.userRepository.getOneById(authUser.id);
   }
+
+
+  async updateStatus(id: number, status: boolean): Promise<UserEntity> {
+    const user: UserEntity = await this.getOneById(id);
+  
+    if (!user) {
+      throw new BadRequestException("User doesn't exist");
+    }
+  
+    user.status = status;
+    const updatedUser = await this.userRepository.save(user);
+  
+    return updatedUser;
+  }
+  
 }

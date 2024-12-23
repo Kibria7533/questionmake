@@ -1,4 +1,4 @@
-import { IsDateString, IsEmail, IsMobilePhone, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsDateString, IsEmail, IsMobilePhone, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Gender } from "../../../config/enum";
 import { enumToString, formatBdMobileNumber } from "../../../config/utils";
@@ -49,8 +49,8 @@ export class CreateUserDto {
   @ApiProperty({ type: String, default: "2024-12-12" })
   dob: string;
 
-    @IsOptional()
-    @IsBoolean()
-    @ApiPropertyOptional({ type: Boolean, default: true })
-    status: boolean; // New field for active/inactive status
+  @IsOptional()
+  @IsBoolean()
+  @ApiPropertyOptional({ type: Boolean, default: true })
+  status?: boolean; // New field for active/inactive status
 }

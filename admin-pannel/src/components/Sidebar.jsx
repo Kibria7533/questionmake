@@ -11,20 +11,20 @@ import {
   FaSearch,
   FaUserTag,
   FaKey,
+  FaEdit,
+  FaGlobe,
 } from "react-icons/fa";
 import Link from "next/link";
 
 const Sidebar = () => {
   const [isQuestionbankOpen, setIsQuestionbankOpen] = useState(false);
   const [isPermissionManagementOpen, setIsPermissionManagementOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  const toggleQuestionbank = () => {
-    setIsQuestionbankOpen(!isQuestionbankOpen);
-  };
-
-  const togglePermissionManagement = () => {
+  const toggleQuestionbank = () => setIsQuestionbankOpen(!isQuestionbankOpen);
+  const togglePermissionManagement = () =>
     setIsPermissionManagementOpen(!isPermissionManagementOpen);
-  };
+  const toggleSettings = () => setIsSettingsOpen(!isSettingsOpen);
 
   const styles = {
     sidebar: {
@@ -60,7 +60,7 @@ const Sidebar = () => {
       backgroundColor: "#0056b3",
     },
     icon: {
-      fontSize: "1.5rem", // Increased icon size
+      fontSize: "1.5rem",
     },
     dropdown: {
       marginLeft: "20px",
@@ -157,12 +157,28 @@ const Sidebar = () => {
         </div>
       )}
 
-      <Link href="/settings" style={{ textDecoration: "none", color: "inherit" }}>
-        <div style={styles.sidebarItem}>
-          <FaCog style={styles.icon} />
-          Settings
+      {/* Settings */}
+      <div onClick={toggleSettings} style={{ ...styles.sidebarItem, cursor: "pointer" }}>
+        <FaCog style={styles.icon} />
+        Settings
+      </div>
+      {isSettingsOpen && (
+        <div style={styles.dropdown}>
+          <Link href="/exam-settings" style={{ textDecoration: "none", color: "inherit" }}>
+            <div style={styles.dropdownItem}>
+              <FaEdit style={styles.icon} />
+              Exam Settings
+            </div>
+          </Link>
+          <Link href="/site-settings" style={{ textDecoration: "none", color: "inherit" }}>
+            <div style={styles.dropdownItem}>
+              <FaGlobe style={styles.icon} />
+              Site Settings
+            </div>
+          </Link>
         </div>
-      </Link>
+      )}
+
       <Link href="/reports" style={{ textDecoration: "none", color: "inherit" }}>
         <div style={styles.sidebarItem}>
           <FaChartBar style={styles.icon} />
