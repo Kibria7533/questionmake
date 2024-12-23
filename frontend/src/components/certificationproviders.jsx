@@ -2,7 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
 const CertificationProviders = () => {
   const [providers, setProviders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,19 +20,29 @@ const CertificationProviders = () => {
       marginBottom: "30px",
     },
     logo: {
-      height: "50px",
-      marginBottom: "10px",
+      height: "80px",
+      width: "80px",
+      borderRadius: "50%",
+      objectFit: "cover",
+      marginBottom: "15px",
+      alignSelf: "center",
     },
     card: {
       border: "1px solid #ddd",
-      borderRadius: "8px",
-      boxShadow: "0px 2px 5px rgba(0,0,0,0.1)",
+      borderRadius: "12px",
+      boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
       padding: "20px",
       textAlign: "center",
       display: "flex",
       flexDirection: "column",
       justifyContent: "space-between",
       height: "100%",
+    },
+    grid: {
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+      gap: "20px", // Adjusts spacing between cards
+      marginTop: "20px",
     },
     examList: {
       textAlign: "left",
@@ -55,7 +67,7 @@ const CertificationProviders = () => {
         setProviders(
           data.map(category => ({
             name: category.name,
-            logo: `${BASE_URL}/file-upload/view-file/${category.logo_path}`, // Replace with actual logo URLs
+            logo: `${BASE_URL}/file-upload/view-file/${category.logo_path}`,
             exams: category.exams.map(exam => ({
               id: exam.id,
               name: exam.name,
@@ -92,28 +104,26 @@ const CertificationProviders = () => {
 
       {/* Grid of Providers */}
       <div className="container">
-        <div className="row">
+        <div style={styles.grid}>
           {providers.map((provider, index) => (
-            <div key={index} className="col-md-6 col-lg-3 d-flex align-items-stretch mb-4">
-              <div style={styles.card}>
-                {/* Logo */}
-                <img
-                  src={provider.logo}
-                  alt={`${provider.name} Logo`}
-                  style={styles.logo}
-                />
-                <h5 className="mb-3">Top {provider.name} Exams</h5>
-                {/* Exam List */}
-                <ul style={styles.examList} className="list-unstyled">
-                  {provider.exams.map((exam) => (
-                    <li key={exam.id}>
-                      <a href={`/exams/${exam.id}`} style={styles.examItem}>
-                        {exam.name}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+            <div key={index} style={styles.card}>
+              {/* Logo */}
+              <img
+                src={provider.logo}
+                alt={`${provider.name} Logo`}
+                style={styles.logo}
+              />
+              <h5 className="mb-3">Top {provider.name} Exams</h5>
+              {/* Exam List */}
+              <ul style={styles.examList} className="list-unstyled">
+                {provider.exams.map((exam) => (
+                  <li key={exam.id}>
+                    <a href={`/exams/${exam.id}`} style={styles.examItem}>
+                      {exam.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>
