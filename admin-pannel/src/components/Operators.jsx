@@ -6,7 +6,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const Operators = () => {
-  const token = localStorage.getItem("access_token");
+  const [token, setToken] = useState(null);
   const [operators, setOperators] = useState([]);
   const [filter, setFilter] = useState("");
   const [editModal, setEditModal] = useState(null);
@@ -148,10 +148,21 @@ const Operators = () => {
     }
   };
 
+         // Load token on client side
+         useEffect(() => {
+          if (typeof window !== "undefined") {
+            const storedToken = localStorage.getItem("access_token");
+            setToken(storedToken);
+          }
+        }, []);
+
   useEffect(() => {
-    fetchOperators();
-    fetchRoles();
-  }, []);
+    if(token){
+      fetchOperators();
+      fetchRoles();
+    }
+
+  }, [token]);
 
   const filteredOperators = operators.filter(
     (operator) =>

@@ -7,7 +7,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const ChapterSettings = () => {
-  const token = localStorage.getItem("access_token"); // Access token from Redux
+  const [token, setToken] = useState(null); // Access token from Redux
   const [chapters, setChapters] = useState([]);
   const [newChapter, setNewChapter] = useState("");
   const [editChapter, setEditChapter] = useState(null);
@@ -114,9 +114,19 @@ const ChapterSettings = () => {
     }
   };
 
+       // Load token on client side
+       useEffect(() => {
+        if (typeof window !== "undefined") {
+          const storedToken = localStorage.getItem("access_token");
+          setToken(storedToken);
+        }
+      }, []);
   useEffect(() => {
-    fetchChapters();
-  }, []);
+    if(token){
+      fetchChapters();
+    }
+    
+  }, [token]);
 
   return (
     <div>

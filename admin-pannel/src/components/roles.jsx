@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const Roles = () => {
-  const token = localStorage.getItem("access_token"); // Access token from localStorage
+  const [token, setToken] = useState(null); // Access token from localStorage
   const [roles, setRoles] = useState([]);
   const [permissionsByModule, setPermissionsByModule] = useState({});
   const [selectedRolePermissions, setSelectedRolePermissions] = useState([]);
@@ -211,10 +211,21 @@ const Roles = () => {
     }
   };
 
+         // Load token on client side
+         useEffect(() => {
+          if (typeof window !== "undefined") {
+            const storedToken = localStorage.getItem("access_token");
+            setToken(storedToken);
+          }
+        }, []);
+
   useEffect(() => {
-    fetchRoles();
-    fetchPermissions();
-  }, []);
+    if(token){
+      fetchRoles();
+      fetchPermissions();
+    }
+
+  }, [token]);
 
   return (
     <div>

@@ -7,7 +7,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const ClassSettings = () => {
-  const token = localStorage.getItem("access_token"); // Access token from userData
+  const [token, setToken] = useState(null); // State to store token// Access token from userData
   const [classes, setClasses] = useState([]);
   const [newClass, setNewClass] = useState("");
   const [editClass, setEditClass] = useState(null);
@@ -110,9 +110,20 @@ const ClassSettings = () => {
     }
   };
 
+
+    // Load token on client side
+    useEffect(() => {
+      if (typeof window !== "undefined") {
+        const storedToken = localStorage.getItem("access_token");
+        setToken(storedToken);
+      }
+    }, []);
+
   useEffect(() => {
+    if (token) {
     fetchClasses();
-  }, []);
+    }
+  }, [token]);
 
   return (
     <div>

@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const Permissions = () => {
-  const token = localStorage.getItem("access_token");
+  const [token, setToken] = useState(null);
   const [groupedPermissions, setGroupedPermissions] = useState({});
 
   // Fetch permissions
@@ -34,9 +34,20 @@ const Permissions = () => {
     }
   };
 
+         // Load token on client side
+         useEffect(() => {
+          if (typeof window !== "undefined") {
+            const storedToken = localStorage.getItem("access_token");
+            setToken(storedToken);
+          }
+        }, []);
+
   useEffect(() => {
-    fetchPermissions();
-  }, []);
+    if(token){
+      fetchPermissions();
+    }
+    
+  }, [token]);
 
   const styles = {
     container: {
