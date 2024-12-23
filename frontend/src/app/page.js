@@ -84,24 +84,27 @@ const Home = () => {
   return (
     <div style={styles.container}>
       {/* Header */}
-      <h1 style={styles.heading}>UPDATED ACTUAL EXAM MATERIALS</h1>
-      <p style={styles.subheading}>A COMMUNITY YOU CAN BELONG TO</p>
+      <h1 style={styles.heading}>সমসাময়িক সকল পরীক্ষার প্রশ্ন সম্ভার</h1>
+      <p style={styles.subheading}>আপনি যেখানে  অন্তর্ভুক্ত হতে পারেন৷</p>
 
       {/* Stats */}
       <div style={styles.stats}>
         <div style={styles.statItem}>
-          <p style={styles.statValue}>94%</p>
-          <p>Said the test questions were almost same</p>
+          <p style={styles.statValue}>৯৪ %</p>
+          <p>ছাত্র ছাত্রী পরীক্ষার প্রশ্ন প্রায় একই ছিল</p>
         </div>
         <div style={styles.statItem}>
-          <p style={styles.statValue}>97%</p>
-          <p>Passed the exams with materials</p>
+          <p style={styles.statValue}>৯৭ %</p>
+          <p>এই উপকরণ গুলো পড়ে পাশ করেন </p>
         </div>
         <div style={styles.statItem}>
-          <p style={styles.statValue}>98%</p>
-          <p>Found the study guides effective and helpful</p>
+          <p style={styles.statValue}>৯৮ %</p>
+          <p>অধ্যয়ন নির্দেশিকাগুলি কার্যকর এবং সহায়ক পাওয়া গেছে</p>
         </div>
       </div>
+      
+
+
 
       {/* Form */}
       <div style={styles.formContainer}>
@@ -124,7 +127,7 @@ const Home = () => {
 
       {/* Footer Text */}
       <p style={styles.footerText}>
-        245 People Signed up in the Last 24H • Updated Exam Content • 1200+ Exams
+      গত 24 ঘন্টায় 245 জন সাইন আপ করেছেন • পরীক্ষার বিষয়বস্তু আপডেট করা হয়েছে • 1200+ পরীক্ষা
       </p>
 
       <CertificationProviders />

@@ -16,7 +16,7 @@ const TopNavbar = () => {
           className="text-primary"
           style={{ fontSize: "1.5rem", fontWeight: "bold" }}
         >
-          QUESTIONHAT
+          প্রশ্নের হাট 
         </div>
       </div>
 
@@ -25,7 +25,7 @@ const TopNavbar = () => {
         <FaEnvelope className="me-2" size={20} color="#007bff" />
         <div>
           <p className="m-0" style={{ color: "#333", fontWeight: "600" }}>
-            MAIL US
+          মেইল করুন 
           </p>
           <p className="m-0" style={{ color: "#666", fontSize: "0.9rem" }}>
             team@questionhat.com

@@ -79,7 +79,7 @@ const MainNavbar = () => {
             {/* Home */}
             <li className="nav-item">
               <a className="nav-link active" href="/">
-                HOME
+              হোম 
               </a>
             </li>
 
@@ -99,7 +99,7 @@ const MainNavbar = () => {
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
-                POPULAR EXAMS
+                জনপ্রিয় প্রশ্ন সমূহ 
               </a>
               <div
                 className={`dropdown-menu w-100 p-3 shadow ${
@@ -141,17 +141,17 @@ const MainNavbar = () => {
             {/* Other Links */}
             <li className="nav-item">
               <a className="nav-link" href="/news">
-                NEWS
+              সংবাদ
               </a>
             </li>
             <li className="nav-item">
               <a className="nav-link" href="/view-all-exam">
-                VIEW ALL EXAMS
+              সবপ্রশ্ন  
               </a>
             </li>
             <li className="nav-item">
               <a className="nav-link" href="/contact">
-                CONTACT
+              যোগাযোগ
               </a>
             </li>
           </ul>
@@ -171,7 +171,7 @@ const MainNavbar = () => {
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  <FaUserCircle size={20} /> Profile
+                  <FaUserCircle size={20} /> প্রোফাইল
                 </button>
                 <ul
                   className="dropdown-menu dropdown-menu-end"
@@ -179,7 +179,7 @@ const MainNavbar = () => {
                 >
                   <li>
                     <a className="dropdown-item" href="/profile">
-                      View Profile
+                    প্রোফাইল দেখুন 
                     </a>
                   </li>
                   <li>
@@ -187,7 +187,7 @@ const MainNavbar = () => {
                       className="dropdown-item text-danger"
                       onClick={handleLogout}
                     >
-                      Logout
+                      লগ আউট 
                     </button>
                   </li>
                 </ul>
@@ -199,7 +199,7 @@ const MainNavbar = () => {
                   className="text-white me-2"
                   style={{ textDecoration: "none" }}
                 >
-                  Login
+                  সাইন-ইন
                 </a>
                 |
                 <a
@@ -207,7 +207,7 @@ const MainNavbar = () => {
                   className="text-white ms-2"
                   style={{ textDecoration: "none" }}
                 >
-                  Sign up
+                 সাইন আপ 
                 </a>
               </div>
             )}

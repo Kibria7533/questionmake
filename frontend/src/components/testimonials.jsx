@@ -8,11 +8,11 @@ const Testimonials = () => {
   const testimonials = [
     {
       name: "Brad Haverford",
-      message: `I did it! Thank you Exam Topics for the epic practice test on AZ-900! I had been discouraged prepping for my Exam when I found your website. It wasn’t my first time I attempted to pass and I felt a little bit like I had been drowning. The AZ-900 might not be a lot of money for some people but for me, it was expensive, and retaking it hurt! I almost gave up until I found ET. The free materials really helped me out when I didn’t have cash to buy books.`,
+      message: `আমি এটা করেছি! AZ-900-এ মহাকাব্য অনুশীলন পরীক্ষার জন্য পরীক্ষার বিষয়গুলিকে ধন্যবাদ! আমি আপনার ওয়েবসাইট খুঁজে পেয়ে আমার পরীক্ষার জন্য প্রস্তুতি নিরুৎসাহিত করা হয়েছে. এটি আমার প্রথমবার নয় যে আমি পাস করার চেষ্টা করেছি এবং আমি কিছুটা অনুভব করেছি যে আমি ডুবে যাচ্ছিলাম। AZ-900 কিছু লোকের জন্য অনেক টাকা নাও হতে পারে কিন্তু আমার জন্য, এটি ব্যয়বহুল ছিল, এবং এটি পুনরায় গ্রহণ করা আঘাত! আমি ইটি খুঁজে না পাওয়া পর্যন্ত আমি প্রায় ছেড়ে দিয়েছিলাম। বই কেনার জন্য যখন আমার কাছে নগদ অর্থ ছিল না তখন বিনামূল্যের উপকরণগুলি আমাকে সত্যিই সাহায্য করেছিল।.`,
     },
     {
       name: "Steven Fasnacht",
-      message: `Dear Exam Topics Staff, I’m not sure who makes your material, but it was spot on for both the exams I just took. Thank you! I’m currently breaking into the IT world as a CCNA and both the exams were over my head. I used your free online practice exams on a whim to see if they could help. After answering about 5 questions, I was sold. They were solid, real-world examples that helped me prepare for the ICND1.`,
+      message: `প্রিয় পরীক্ষার বিষয় স্টাফ, আমি নিশ্চিত নই কে আপনার উপাদান তৈরি করে, তবে আমি এইমাত্র যে দুটি পরীক্ষা দিয়েছিলাম তার জন্য এটি ছিল। ধন্যবাদ! আমি বর্তমানে একটি CCNA হিসাবে আইটি জগতে প্রবেশ করছি এবং উভয় পরীক্ষাই আমার মাথায় ছিল। তারা সাহায্য করতে পারে কিনা তা দেখার জন্য আমি আপনার বিনামূল্যের অনলাইন অনুশীলন পরীক্ষাগুলি ব্যবহার করেছি। প্রায় 5টি প্রশ্নের উত্তর দেওয়ার পর আমি বিক্রি হয়ে গেলাম। তারা দৃঢ়, বাস্তব-বিশ্বের উদাহরণ যা আমাকে ICND1-এর জন্য প্রস্তুত করতে সাহায্য করেছিল।.`,
     },
   ];
 
@@ -74,7 +74,7 @@ const Testimonials = () => {
     <div style={styles.section}>
       {/* Section Header */}
       <div style={styles.header}>
-        <h2 style={styles.headerTitle}>Some Nice Emails We Received</h2>
+        <h2 style={styles.headerTitle}>আমাদের পাঠানো  কিছু চমৎকার ইমেল</h2>
         <p style={styles.headerSubtitle}>
           Here is a collection of our favorite emails we received from users.
         </p>

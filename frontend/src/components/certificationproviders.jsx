@@ -96,9 +96,9 @@ const CertificationProviders = () => {
     <div style={styles.section}>
       {/* Header */}
       <div style={styles.header}>
-        <h2 className="fw-bold">Top Exams & Certification Providers</h2>
+        <h2 className="fw-bold">শীর্ষ পরীক্ষা এবং সার্টিফিকেশন প্রদানকারী</h2>
         <p className="text-muted">
-          QuestionHat is not affiliated or certified by any certification provider.
+        QuestionHat কোনো সার্টিফিকেশন প্রদানকারীর দ্বারা অনুমোদিত বা প্রত্যয়িত নয়।
         </p>
       </div>
 
