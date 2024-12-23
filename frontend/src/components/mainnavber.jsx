@@ -1,15 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { FaSearch, FaUserCircle } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { login, logout } from "../redux/store";
+
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
 const MainNavbar = () => {
-  const { isAuthenticated } = useSelector((state) => state.user); // Use global authentication state
+  const { isAuthenticated } = useSelector((state) => state.user);
   const router = useRouter();
   const dispatch = useDispatch();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -27,7 +27,7 @@ const MainNavbar = () => {
     const token = await localStorage.getItem("access_token");
     if (token) {
       const token = await localStorage.getItem("access_token");
-    } 
+    }
   };
 
   const fetchMenuData = async () => {
@@ -57,162 +57,182 @@ const MainNavbar = () => {
     fetchMenuData();
   }, [dispatch, router]);
 
+  const styles = {
+    navbar: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      backgroundColor: "#222",
+      color: "white",
+      padding: "10px 20px",
+      position: "sticky",
+      top: "0",
+      zIndex: "1000",
+    },
+    logo: {
+      fontSize: "1.5rem",
+      fontWeight: "bold",
+      cursor: "pointer",
+    },
+    menu: {
+      display: "flex",
+      alignItems: "center",
+      gap: "20px",
+    },
+    menuItem: {
+      color: "white",
+      textDecoration: "none",
+      cursor: "pointer",
+      position: "relative",
+    },
+    dropdownMenu: {
+      position: "absolute",
+      top: "100%",
+      left: "0",
+      backgroundColor: "white",
+      color: "#222",
+      padding: "10px",
+      borderRadius: "5px",
+      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+      display: isDropdownOpen ? "block" : "none",
+      minWidth: "200px",
+    },
+    dropdownItem: {
+      padding: "5px 10px",
+      textDecoration: "none",
+      color: "#222",
+      display: "block",
+      borderBottom: "1px solid #ddd",
+    },
+    dropdownItemLast: {
+      borderBottom: "none",
+    },
+    actions: {
+      display: "flex",
+      alignItems: "center",
+      gap: "10px",
+    },
+    button: {
+      backgroundColor: "#007bff",
+      color: "white",
+      border: "none",
+      padding: "5px 10px",
+      borderRadius: "5px",
+      cursor: "pointer",
+    },
+    profileButton: {
+      display: "flex",
+      alignItems: "center",
+      gap: "5px",
+      backgroundColor: "transparent",
+      border: "1px solid white",
+      color: "white",
+      padding: "5px 10px",
+      borderRadius: "5px",
+      cursor: "pointer",
+    },
+    authLinks: {
+      display: "flex",
+      alignItems: "center",
+      gap: "10px",
+    },
+    authLink: {
+      color: "white",
+      textDecoration: "none",
+    },
+  };
+
   return (
-    <nav className="navbar navbar-expand-md navbar-dark bg-dark sticky-top px-3">
-      <div className="container-fluid">
-        {/* Toggler for small screens */}
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
+    <nav style={styles.navbar}>
+      {/* Logo */}
+      <div style={styles.logo} onClick={() => router.push("/")}>
+      
+      </div>
+
+      {/* Menu */}
+      <div style={styles.menu}>
+        <a href="/" style={styles.menuItem}>
+          হোম
+        </a>
+        <div
+          style={styles.menuItem}
+          onMouseEnter={() => setIsDropdownOpen(true)}
+          onMouseLeave={() => setIsDropdownOpen(false)}
         >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-
-        {/* Collapsible Menu */}
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-            {/* Home */}
-            <li className="nav-item">
-              <a className="nav-link active" href="/">
-              হোম 
-              </a>
-            </li>
-
-            {/* Mega Menu */}
-            <li
-              className={`nav-item dropdown position-static ${
-                isDropdownOpen ? "show" : ""
-              }`}
-              onMouseEnter={() => setIsDropdownOpen(true)}
-              onMouseLeave={() => setIsDropdownOpen(false)}
-            >
-              <a
-                className="nav-link dropdown-toggle"
-                href="#"
-                id="navbarDropdown"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                জনপ্রিয় প্রশ্ন সমূহ 
-              </a>
-              <div
-                className={`dropdown-menu w-100 p-3 shadow ${
-                  isDropdownOpen ? "show" : ""
-                }`}
-                aria-labelledby="navbarDropdown"
-              >
-                {loading ? (
-                  <div className="text-center">Loading...</div>
-                ) : error ? (
-                  <div className="text-danger">Error: {error}</div>
-                ) : (
-                  <div className="container">
-                    <div className="row">
-                      {menuData.map((menu, index) => (
-                        <div
-                          key={index}
-                          className="col-md-4 border-end mb-3"
-                          style={{ paddingLeft: "10px" }}
-                        >
-                          <h6 className="text-primary">{menu.category}</h6>
-                          <ul className="list-unstyled">
-                            {menu.items.map((item, idx) => (
-                              <li key={idx} className="mb-1">
-                                <a href={item.link} className="text-dark">
-                                  {item.name}
-                                </a>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </li>
-
-            {/* Other Links */}
-            <li className="nav-item">
-              <a className="nav-link" href="/news">
-              সংবাদ
-              </a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="/view-all-exam">
-              সবপ্রশ্ন  
-              </a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="/contact">
-              যোগাযোগ
-              </a>
-            </li>
-          </ul>
-
-          {/* Search, Login/Signup or Profile */}
-          <div className="d-flex align-items-center gap-3">
-            <button className="btn btn-primary">
-              <FaSearch color="white" />
-            </button>
-
-            {isAuthenticated ? (
-              <div className="dropdown">
-                <button
-                  className="btn btn-outline-light dropdown-toggle"
-                  type="button"
-                  id="profileDropdown"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  <FaUserCircle size={20} /> প্রোফাইল
-                </button>
-                <ul
-                  className="dropdown-menu dropdown-menu-end"
-                  aria-labelledby="profileDropdown"
-                >
-                  <li>
-                    <a className="dropdown-item" href="/profile">
-                    প্রোফাইল দেখুন 
-                    </a>
-                  </li>
-                  <li>
-                    <button
-                      className="dropdown-item text-danger"
-                      onClick={handleLogout}
-                    >
-                      লগ আউট 
-                    </button>
-                  </li>
-                </ul>
-              </div>
+          জনপ্রিয় প্রশ্ন সমূহ
+          <div style={styles.dropdownMenu}>
+            {loading ? (
+              <div>Loading...</div>
+            ) : error ? (
+              <div style={{ color: "red" }}>Error: {error}</div>
             ) : (
-              <div>
-                <a
-                  href="/login"
-                  className="text-white me-2"
-                  style={{ textDecoration: "none" }}
-                >
-                  সাইন-ইন
-                </a>
-                |
-                <a
-                  href="/signup"
-                  className="text-white ms-2"
-                  style={{ textDecoration: "none" }}
-                >
-                 সাইন আপ 
-                </a>
-              </div>
+              menuData.map((menu, index) => (
+                <div key={index}>
+                  <strong>{menu.category}</strong>
+                  {menu.items.map((item, idx) => (
+                    <a
+                      key={idx}
+                      href={item.link}
+                      style={{
+                        ...styles.dropdownItem,
+                        ...(idx === menu.items.length - 1 && styles.dropdownItemLast),
+                      }}
+                    >
+                      {item.name}
+                    </a>
+                  ))}
+                </div>
+              ))
             )}
           </div>
         </div>
+        <a href="/news" style={styles.menuItem}>
+          সংবাদ
+        </a>
+        <a href="/view-all-exam" style={styles.menuItem}>
+          সবপ্রশ্ন
+        </a>
+        <a href="/contact" style={styles.menuItem}>
+          যোগাযোগ
+        </a>
+      </div>
+
+      {/* Actions */}
+      <div style={styles.actions}>
+        {/* Search Button */}
+        <button style={styles.button}>
+          <FaSearch />
+        </button>
+
+        {/* Authentication Links */}
+        {isAuthenticated ? (
+          <div className="dropdown">
+            <button style={styles.profileButton}>
+              <FaUserCircle /> প্রোফাইল
+            </button>
+            <div style={styles.dropdownMenu}>
+              <a href="/profile" style={styles.dropdownItem}>
+                প্রোফাইল দেখুন
+              </a>
+              <button
+                onClick={handleLogout}
+                style={{ ...styles.dropdownItem, color: "red" }}
+              >
+                লগ আউট
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div style={styles.authLinks}>
+            <a href="/login" style={styles.authLink}>
+              সাইন-ইন
+            </a>
+            |
+            <a href="/signup" style={styles.authLink}>
+              সাইন আপ
+            </a>
+          </div>
+        )}
       </div>
     </nav>
   );

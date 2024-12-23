@@ -5,9 +5,9 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { login, logout } from "../../redux/store";
-import { Provider, useDispatch } from "react-redux";
-// Root Layout with Sidebar and Header
+import { useDispatch } from "react-redux";
+import { login } from "../../redux/store";
+
 export default function RootLayout({ children }) {
   const styles = {
     container: {
@@ -28,35 +28,26 @@ export default function RootLayout({ children }) {
     },
   };
 
-
   const dispatch = useDispatch();
   const router = useRouter();
 
-  const setToken= async ()=>{
-    const token =await localStorage.getItem("access_token");
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
     if (token) {
-      // Simulate user data fetch or token validation
       dispatch(login({ token }));
     } else {
       router.push("/login");
     }
-  }
-  useEffect(() => {
-    setToken();
-
   }, [dispatch, router]);
 
-
   return (
-    <html lang="en">
-      <body style={styles.container}>
-        <Sidebar />
-        <div style={styles.content}>
-          <Header />
-          <main style={styles.main}>{children}</main>
-          <Footer />
-        </div>
-      </body>
-    </html>
+    <div style={styles.container}>
+      <Sidebar />
+      <div style={styles.content}>
+        <Header />
+        <main style={styles.main}>{children}</main>
+        <Footer />
+      </div>
+    </div>
   );
 }
