@@ -9,9 +9,9 @@ const Operators = () => {
   const token = localStorage.getItem("access_token");
   const [operators, setOperators] = useState([]);
   const [filter, setFilter] = useState("");
-  const [viewModal, setViewModal] = useState(null);
   const [editModal, setEditModal] = useState(null);
   const [addModal, setAddModal] = useState(false);
+  const [roles, setRoles] = useState([]); // Store available roles
   const [newOperator, setNewOperator] = useState({
     name: "",
     email: "",
@@ -20,7 +20,7 @@ const Operators = () => {
     dob: "",
     password: "",
     confirm_password: "",
-    status: "Active",
+    status: true, // Default to Active
   });
 
   // Fetch all operators
@@ -42,8 +42,28 @@ const Operators = () => {
     }
   };
 
+  // Fetch roles from the API
+  const fetchRoles = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/roles`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "*/*",
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setRoles(data);
+      } else {
+        alert("Failed to fetch roles.");
+      }
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
+  };
+
   // Add a new operator
-  const handleAddSave = async () => {
+  const handleAddOperator = async () => {
     try {
       const response = await fetch(`${BASE_URL}/users`, {
         method: "POST",
@@ -54,8 +74,9 @@ const Operators = () => {
         body: JSON.stringify(newOperator),
       });
       if (response.ok) {
-        const newOperatorData = await response.json();
-        setOperators([...operators, newOperatorData]);
+        const createdOperator = await response.json();
+        setOperators([...operators, createdOperator]);
+        setAddModal(false);
         setNewOperator({
           name: "",
           email: "",
@@ -64,9 +85,8 @@ const Operators = () => {
           dob: "",
           password: "",
           confirm_password: "",
-          status: "Active",
+          status: true, // Reset to default Active
         });
-        setAddModal(false);
       } else {
         const errorData = await response.json();
         alert(`Failed to add operator: ${errorData.message.join(", ")}`);
@@ -76,16 +96,42 @@ const Operators = () => {
     }
   };
 
-  // Edit an operator
-  const handleEditSave = async () => {
+  // Update operator role
+  const handleSaveChanges = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/users/${editModal.id}`, {
+      const response = await fetch(`${BASE_URL}/users/change-role`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(editModal),
+        body: JSON.stringify({
+          user_id: editModal.id,
+          role: editModal.role,
+        }),
+      });
+      if (response.ok) {
+        alert("Operator role updated successfully!");
+        setEditModal(null);
+        fetchOperators(); // Refresh operators
+      } else {
+        alert("Failed to update operator role.");
+      }
+    } catch (error) {
+      console.error("Error updating operator role:", error);
+    }
+  };
+
+  // Toggle operator status (Activate/Deactivate)
+  const handleToggleStatus = async (id, currentStatus) => {
+    try {
+      const response = await fetch(`${BASE_URL}/users/${id}/status`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: !currentStatus }), // Toggle status
       });
       if (response.ok) {
         const updatedOperator = await response.json();
@@ -94,38 +140,17 @@ const Operators = () => {
             operator.id === updatedOperator.id ? updatedOperator : operator
           )
         );
-        setEditModal(null);
       } else {
-        alert("Failed to update operator.");
+        alert("Failed to toggle operator status.");
       }
     } catch (error) {
-      console.error("Error updating operator:", error);
-    }
-  };
-
-  // Delete an operator
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this operator?")) return;
-
-    try {
-      const response = await fetch(`${BASE_URL}/users/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.ok) {
-        setOperators(operators.filter((operator) => operator.id !== id));
-      } else {
-        alert("Failed to delete operator.");
-      }
-    } catch (error) {
-      console.error("Error deleting operator:", error);
+      console.error("Error toggling operator status:", error);
     }
   };
 
   useEffect(() => {
     fetchOperators();
+    fetchRoles();
   }, []);
 
   const filteredOperators = operators.filter(
@@ -153,9 +178,10 @@ const Operators = () => {
       <table className="table table-bordered">
         <thead className="bg-primary text-white">
           <tr>
+            <th>ID</th>
             <th>Name</th>
             <th>Email</th>
-            <th>Mobile</th>
+            <th>Role</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
@@ -163,28 +189,25 @@ const Operators = () => {
         <tbody>
           {filteredOperators.map((operator) => (
             <tr key={operator.id}>
+              <td>{operator.id}</td>
               <td>{operator.name}</td>
               <td>{operator.email}</td>
-              <td>{operator.mobile}</td>
-              <td>{operator.status}</td>
+              <td>{operator.rolename}</td>
+              <td>{operator.status ? "Active" : "Inactive"}</td>
               <td>
                 <button
                   className="btn btn-info me-2"
-                  onClick={() => setViewModal(operator)}
-                >
-                  View
-                </button>
-                <button
-                  className="btn btn-warning me-2"
-                  onClick={() => setEditModal({ ...operator })}
+                  onClick={() => setEditModal(operator)}
                 >
                   Edit
                 </button>
                 <button
-                  className="btn btn-danger"
-                  onClick={() => handleDelete(operator.id)}
+                  className={`btn ${
+                    operator.status ? "btn-danger" : "btn-success"
+                  }`}
+                  onClick={() => handleToggleStatus(operator.id, operator.status)}
                 >
-                  Delete
+                  {operator.status ? "Deactivate" : "Activate"}
                 </button>
               </td>
             </tr>
@@ -192,7 +215,7 @@ const Operators = () => {
         </tbody>
       </table>
 
-      {/* Add Modal */}
+      {/* Add Operator Modal */}
       {addModal && (
         <div
           className="modal show d-block"
@@ -272,25 +295,31 @@ const Operators = () => {
                   placeholder="Confirm Password"
                   value={newOperator.confirm_password}
                   onChange={(e) =>
-                    setNewOperator({ ...newOperator, confirm_password: e.target.value })
+                    setNewOperator({
+                      ...newOperator,
+                      confirm_password: e.target.value,
+                    })
                   }
                 />
                 <select
                   className="form-control mb-2"
-                  value={newOperator.status}
+                  value={newOperator.status ? "true" : "false"}
                   onChange={(e) =>
-                    setNewOperator({ ...newOperator, status: e.target.value })
+                    setNewOperator({
+                      ...newOperator,
+                      status: e.target.value === "true",
+                    })
                   }
                 >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
+                  <option value="true">Active</option>
+                  <option value="false">Inactive</option>
                 </select>
               </div>
               <div className="modal-footer">
                 <button
                   type="button"
                   className="btn btn-primary"
-                  onClick={handleAddSave}
+                  onClick={handleAddOperator}
                 >
                   Add
                 </button>
@@ -300,6 +329,123 @@ const Operators = () => {
                   onClick={() => setAddModal(false)}
                 >
                   Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Operator Modal */}
+      {editModal && (
+        <div
+          className="modal show d-block"
+          tabIndex="-1"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+        >
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Edit Operator: {editModal.name}</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setEditModal(null)}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <form>
+                  <div className="row">
+                    <div className="col-md-6 mb-3">
+                      <label htmlFor="name" className="form-label">
+                        Name
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="name"
+                        value={editModal.name}
+                        disabled
+                      />
+                    </div>
+                    <div className="col-md-6 mb-3">
+                      <label htmlFor="email" className="form-label">
+                        Email
+                      </label>
+                      <input
+                        type="email"
+                        className="form-control"
+                        id="email"
+                        value={editModal.email}
+                        disabled
+                      />
+                    </div>
+                    <div className="col-md-6 mb-3">
+                      <label htmlFor="role" className="form-label">
+                        Role
+                      </label>
+                      <select
+                        className="form-select"
+                        id="role"
+                        value={editModal.role}
+                        onChange={(e) =>
+                          setEditModal({
+                            ...editModal,
+                            role: parseInt(e.target.value, 10),
+                          })
+                        }
+                      >
+                        <option value="">Select Role</option>
+                        {roles.map((role) => (
+                          <option key={role.id} value={role.id}>
+                            {role.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Permissions */}
+                  <div className="mb-3">
+                    <h5 className="form-label">Permissions</h5>
+                    <div className="row">
+                      {editModal.permissions.map((perm) => (
+                        <div className="col-md-4" key={perm.id}>
+                          <div className="form-check">
+                            <input
+                              className="form-check-input"
+                              type="checkbox"
+                              id={`perm-${perm.id}`}
+                              checked
+                              disabled
+                            />
+                            <label
+                              className="form-check-label"
+                              htmlFor={`perm-${perm.id}`}
+                            >
+                              {perm.name}
+                            </label>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setEditModal(null)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleSaveChanges}
+                >
+                  Save Changes
                 </button>
               </div>
             </div>

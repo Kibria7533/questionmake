@@ -51,6 +51,32 @@ const Users = () => {
     }
   };
 
+  // Toggle user status (Activate/Deactivate)
+  const handleToggleStatus = async (id, currentStatus) => {
+    try {
+      const response = await fetch(`${BASE_URL}/users/${id}/status`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: !currentStatus }), // Toggle status
+      });
+      if (response.ok) {
+        const updatedUser = await response.json();
+        setUsers(
+          users.map((user) =>
+            user.id === updatedUser.id ? updatedUser : user
+          )
+        );
+      } else {
+        alert("Failed to toggle user status.");
+      }
+    } catch (error) {
+      console.error("Error toggling user status:", error);
+    }
+  };
+
   // Update user role
   const handleSaveChanges = async () => {
     try {
@@ -105,6 +131,7 @@ const Users = () => {
             <th>Name</th>
             <th>Email</th>
             <th>Role</th>
+            <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -115,12 +142,21 @@ const Users = () => {
               <td>{user.name}</td>
               <td>{user.email}</td>
               <td>{user.rolename}</td>
+              <td>{user.status ? "Active" : "Inactive"}</td>
               <td>
                 <button
                   className="btn btn-info me-2"
                   onClick={() => setEditModal(user)}
                 >
                   Edit
+                </button>
+                <button
+                  className={`btn ${
+                    user.status ? "btn-danger" : "btn-success"
+                  }`}
+                  onClick={() => handleToggleStatus(user.id, user.status)}
+                >
+                  {user.status ? "Deactivate" : "Activate"}
                 </button>
               </td>
             </tr>

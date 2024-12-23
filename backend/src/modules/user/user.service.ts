@@ -112,4 +112,19 @@ export class UserService {
     const authUser: UserEntity = AuthUser.get();
     return this.userRepository.getOneById(authUser.id);
   }
+
+
+  async updateStatus(id: number, status: boolean): Promise<UserEntity> {
+    const user: UserEntity = await this.getOneById(id);
+  
+    if (!user) {
+      throw new BadRequestException("User doesn't exist");
+    }
+  
+    user.status = status;
+    const updatedUser = await this.userRepository.save(user);
+  
+    return updatedUser;
+  }
+  
 }
