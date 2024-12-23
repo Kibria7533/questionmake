@@ -90,7 +90,7 @@ const Permissions = () => {
       {/* Permissions Table */}
       {Object.keys(groupedPermissions).map((moduleName) => (
         <div key={moduleName}>
-          <h3 style={styles.moduleTitle}>{moduleName}</h3>
+          <h3 style={styles.moduleTitle}>{moduleName} Module</h3>
           <table style={styles.table}>
             <thead>
               <tr>

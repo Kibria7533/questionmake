@@ -26,7 +26,7 @@ const Operators = () => {
   // Fetch all operators
   const fetchOperators = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/users`, {
+      const response = await fetch(`${BASE_URL}/users?role=2`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
