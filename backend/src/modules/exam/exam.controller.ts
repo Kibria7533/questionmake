@@ -6,6 +6,8 @@ import { PublicBaseController } from "../../guards/public.base.controller";
 import { ExamEntity } from "../../database/entities/exam.entity";
 import { UpdateExamDto } from "./dto/update-exam.dto";
 import { DeleteResult } from "typeorm/query-builder/result/DeleteResult";
+import { HasPermission } from "../../config/meta.data";
+import { Permissions } from "../../config/permissions";
 
 @Controller("exam")
 export class ExamController extends PublicBaseController {
@@ -13,6 +15,7 @@ export class ExamController extends PublicBaseController {
   private readonly service: ExamService;
 
   @Post()
+  @HasPermission([Permissions.CREATE_UPDATE_EXAM])
   @ApiConsumes("application/json", `application/x-www-form-urlencoded`)
   @ApiProduces("application/json")
   async create(@Body() reqDto: CreateExamDto): Promise<ExamEntity> {
@@ -20,6 +23,7 @@ export class ExamController extends PublicBaseController {
   }
 
   @Put(":id")
+  @HasPermission([Permissions.CREATE_UPDATE_EXAM])
   @ApiConsumes("application/json", `application/x-www-form-urlencoded`)
   @ApiProduces("application/json")
   async update(@Param("id", ParseIntPipe) id: number, @Body() reqDto: UpdateExamDto): Promise<ExamEntity> {
@@ -27,16 +31,19 @@ export class ExamController extends PublicBaseController {
   }
 
   @Get()
+  @HasPermission([Permissions.GET_EXAM])
   async getAll(): Promise<ExamEntity[]> {
     return this.service.getAll();
   }
 
   @Get(":id")
+  @HasPermission([Permissions.GET_EXAM])
   async getOne(@Param("id", ParseIntPipe) id: number): Promise<ExamEntity> {
     return this.service.getOneById(id);
   }
 
   @Delete(":id")
+  @HasPermission([Permissions.DELETE_EXAM])
   async delete(@Param("id", ParseIntPipe) id: number): Promise<DeleteResult> {
     return this.service.delete(id);
   }

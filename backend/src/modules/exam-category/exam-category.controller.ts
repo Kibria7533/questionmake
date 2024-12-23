@@ -8,6 +8,8 @@ import { CreateExamCategoryDto } from "./dto/create-exam-category.dto";
 import { DeleteResult } from "typeorm/query-builder/result/DeleteResult";
 import { ExamCategoryWithExamsDto } from "./dto/exam-with-category.dto";
 import { FilterExamCategoryDto } from "./dto/filter-exam-category.dto";
+import { HasPermission } from "../../config/meta.data";
+import { Permissions } from "../../config/permissions";
 
 @Controller("exam-category")
 export class ExamCategoryController extends PublicBaseController {
@@ -15,6 +17,7 @@ export class ExamCategoryController extends PublicBaseController {
   private readonly service: ExamCategoryService;
 
   @Post()
+  @HasPermission([Permissions.CREATE_UPDATE_EXAM_CATEGORY])
   @ApiConsumes("application/json", `application/x-www-form-urlencoded`)
   @ApiProduces("application/json")
   async create(@Body() reqDto: CreateExamCategoryDto): Promise<ExamCategoryEntity> {
@@ -23,6 +26,7 @@ export class ExamCategoryController extends PublicBaseController {
   }
 
   @Put(":id")
+  @HasPermission([Permissions.CREATE_UPDATE_EXAM_CATEGORY])
   @ApiConsumes("application/json", `application/x-www-form-urlencoded`)
   @ApiProduces("application/json")
   async update(@Param("id", ParseIntPipe) id: number, @Body() reqDto: UpdateExamCategoryDto): Promise<ExamCategoryEntity> {
@@ -30,26 +34,31 @@ export class ExamCategoryController extends PublicBaseController {
   }
 
   @Get()
+  @HasPermission([Permissions.GET_EXAM_CATEGORY])
   async getAll(@Query() reqDto: FilterExamCategoryDto): Promise<ExamCategoryEntity[]> {
     return this.service.getAll(reqDto);
   }
 
   @Get("/exam-with-categories")
+  @HasPermission([Permissions.GET_EXAM_CATEGORY])
   async getAllCategoriesWithExams(): Promise<ExamCategoryWithExamsDto[]> {
     return this.service.getAllCategoriesWithExams();
   }
 
   @Get(":id")
+  @HasPermission([Permissions.GET_EXAM_CATEGORY])
   async getOne(@Param("id", ParseIntPipe) id: number): Promise<ExamCategoryEntity> {
     return this.service.getOneById(id);
   }
 
   @Get(":id/exams")
+  @HasPermission([Permissions.GET_EXAM_CATEGORY])
   async getOneWithExams(@Param("id", ParseIntPipe) id: number): Promise<ExamCategoryEntity> {
     return this.service.getOneWithExams(id);
   }
 
   @Delete(":id")
+  @HasPermission([Permissions.DELETE_EXAM_CATEGORY])
   async delete(@Param("id") id: string): Promise<DeleteResult> {
     return this.service.delete(id);
   }

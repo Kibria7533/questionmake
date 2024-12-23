@@ -9,6 +9,7 @@ import { PrivateBaseController } from "../../guards/private.base.controller";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { UpdateStatusDto } from "./dto/update-status.dto";
 import { FilterUserDto } from "./dto/filter-user.dto";
+import { Permissions } from "../../config/permissions";
 
 @Controller("users")
 export class UserController extends PrivateBaseController {
@@ -16,7 +17,7 @@ export class UserController extends PrivateBaseController {
   private readonly userService: UserService;
 
   @Post()
-  @HasPermission([])
+  @HasPermission([Permissions.CREATE_UPDATE_USER])
   @ApiConsumes("application/json", `application/x-www-form-urlencoded`)
   @ApiProduces("application/json")
   async create(@Body() reqDto: CreateUserDto): Promise<UserEntity> {
@@ -24,7 +25,7 @@ export class UserController extends PrivateBaseController {
   }
 
   @Post()
-  @HasPermission([])
+  @HasPermission([Permissions.CREATE_UPDATE_USER])
   @ApiConsumes("application/json", `application/x-www-form-urlencoded`)
   @ApiProduces("application/json")
   async update(@Param("id", ParseIntPipe) id: number, @Body() reqDto: UpdateUserDto): Promise<UserEntity> {
@@ -32,7 +33,7 @@ export class UserController extends PrivateBaseController {
   }
 
   @Get()
-  @HasPermission([])
+  @HasPermission([Permissions.GET_USER])
   async getAll(@Query() reqDto: FilterUserDto): Promise<UserEntity[]> {
     return this.userService.getAll(reqDto);
   }
@@ -43,13 +44,13 @@ export class UserController extends PrivateBaseController {
   }
 
   @Get(":id")
-  @HasPermission([])
+  @HasPermission([Permissions.GET_USER])
   async getOne(@Param("id", ParseIntPipe) id: number): Promise<UserEntity> {
     return this.userService.getOneById(id);
   }
 
   @Put("change-role")
-  @HasPermission([])
+  @HasPermission([Permissions.CREATE_UPDATE_USER])
   @ApiConsumes("application/json", `application/x-www-form-urlencoded`)
   @ApiProduces("application/json")
   async changeRole(@Body() reqDto: ChangeRoleDto): Promise<UserEntity> {
@@ -57,7 +58,7 @@ export class UserController extends PrivateBaseController {
   }
 
   @Put(":id/status")
-  @HasPermission([])
+  @HasPermission([Permissions.CREATE_UPDATE_USER])
   @ApiConsumes("application/json", `application/x-www-form-urlencoded`)
   @ApiProduces("application/json")
   async updateStatus(@Param("id", ParseIntPipe) id: number, @Body() reqDto: UpdateStatusDto): Promise<UserEntity> {

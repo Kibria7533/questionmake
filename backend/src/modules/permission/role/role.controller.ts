@@ -16,6 +16,7 @@ export class RoleController extends PrivateBaseController {
   private readonly service: RoleService;
 
   @Post()
+  @HasPermission([Permissions.CREATE_UPDATE_ROLE])
   @ApiConsumes("application/json", `application/x-www-form-urlencoded`)
   @ApiProduces("application/json")
   async create(@Body() reqDto: CreateRoleDto): Promise<RoleEntity> {
@@ -23,6 +24,7 @@ export class RoleController extends PrivateBaseController {
   }
 
   @Put(":id")
+  @HasPermission([Permissions.CREATE_UPDATE_ROLE])
   @ApiConsumes("application/json", `application/x-www-form-urlencoded`)
   @ApiProduces("application/json")
   async update(@Param("id", ParseIntPipe) id: number, @Body() reqDto: UpdateRoleDto): Promise<RoleEntity> {
@@ -30,29 +32,33 @@ export class RoleController extends PrivateBaseController {
   }
 
   @Put(":id/assign-permissions")
+  @HasPermission([Permissions.CREATE_UPDATE_ROLE])
   @ApiConsumes("application/json", `application/x-www-form-urlencoded`)
   @ApiProduces("application/json")
   async assignPermissions(@Param("id", ParseIntPipe) id: number, @Body() reqDto: AssignPermissionsDto): Promise<RoleEntity> {
     return this.service.assignPermissions(id, reqDto);
   }
 
-  @HasPermission([Permissions.GET_ROLE])
   @Get()
+  @HasPermission([Permissions.GET_ROLE])
   async getAll(): Promise<RoleEntity[]> {
     return this.service.getAll();
   }
 
   @Get(":id")
+  @HasPermission([Permissions.GET_ROLE])
   async getOne(@Param("id", ParseIntPipe) id: number): Promise<RoleEntity> {
     return this.service.getOneById(id);
   }
 
   @Get(":id/permissions")
+  @HasPermission([Permissions.GET_ROLE])
   async getOneWithPermissions(@Param("id", ParseIntPipe) id: number): Promise<RoleEntity> {
     return this.service.getOneWithPermissions(id);
   }
 
   @Delete(":id")
+  @HasPermission([Permissions.DELETE_ROLE])
   async delete(@Param("id") id: string): Promise<DeleteResult> {
     return this.service.delete(id);
   }

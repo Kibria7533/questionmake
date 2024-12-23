@@ -12,11 +12,6 @@ export class PermissionSeed implements Seeder {
       module_id: 1,
     },
     {
-      id: 2,
-      name: Permissions.CHANGE_ROLE,
-      module_id: 1,
-    },
-    {
       id: 3,
       name: Permissions.GET_USER,
       module_id: 1,
@@ -99,23 +94,6 @@ export class PermissionSeed implements Seeder {
       name: Permissions.DELETE_CHAPTER,
       module_id: 5,
     },
-
-    // EXAM TYPE
-    {
-      id: 100,
-      name: Permissions.CREATE_UPDATE_EXAM_TYPE,
-      module_id: 6,
-    },
-    {
-      id: 101,
-      name: Permissions.GET_EXAM_TYPE,
-      module_id: 6,
-    },
-    {
-      id: 102,
-      name: Permissions.DELETE_EXAM_TYPE,
-      module_id: 6,
-    },
     // EXAM CATEGORY
     {
       id: 120,
@@ -151,7 +129,6 @@ export class PermissionSeed implements Seeder {
   ];
 
   async run(): Promise<any> {
-
     await AppDataSource.query("SET FOREIGN_KEY_CHECKS=0");
 
     await AppDataSource.getRepository(PermissionEntity).clear();
