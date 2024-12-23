@@ -10,6 +10,7 @@ import { RoleService } from "../permission/role/role.service";
 import { PermissionEntity } from "../../database/entities/permission.entity";
 import { AuthUser } from "../../config/alc";
 import { UpdateUserDto } from "./dto/update-user.dto";
+import { FilterUserDto } from "./dto/filter-user.dto";
 
 @Injectable()
 export class UserService {
@@ -33,7 +34,6 @@ export class UserService {
     reqDto.password = await bcrypt.hash(reqDto.password, HASH_ROUND);
 
     let user: UserEntity = this.userRepository.create(reqDto);
-   
 
     user = await this.userRepository.save(user);
 
@@ -69,8 +69,8 @@ export class UserService {
     return user;
   }
 
-  async getAll(): Promise<UserEntity[]> {
-    const users = await this.userRepository.getAll();
+  async getAll(reqDto: FilterUserDto): Promise<UserEntity[]> {
+    const users = await this.userRepository.getAll(reqDto);
     for (const user of users) {
       if (user.role !== undefined) {
         // Fetch the role details using RoleService
@@ -113,18 +113,16 @@ export class UserService {
     return this.userRepository.getOneById(authUser.id);
   }
 
-
   async updateStatus(id: number, status: boolean): Promise<UserEntity> {
     const user: UserEntity = await this.getOneById(id);
-  
+
     if (!user) {
       throw new BadRequestException("User doesn't exist");
     }
-  
+
     user.status = status;
     const updatedUser = await this.userRepository.save(user);
-  
+
     return updatedUser;
   }
-  
 }

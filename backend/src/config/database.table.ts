@@ -9,3 +9,4 @@ export const TABLE_PERMISSION_MODULES = "permission_modules";
 export const TABLE_PERMISSIONS = "permissions";
 export const TABLE_ROLES = "roles";
 export const TABLE_ROLE_PERMISSIONS = "role_permissions";
+export const TABLE_CONTACTS = "contacts";

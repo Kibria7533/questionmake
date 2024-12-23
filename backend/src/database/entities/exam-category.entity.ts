@@ -1,6 +1,8 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { TABLE_EXAM_CATEGORIES } from "../../config/database.table";
 import { ExamEntity } from "./exam.entity";
+import { BooleanStatus } from "../../config/enum";
+import { enumToString } from "../../config/utils";
 
 @Entity(TABLE_EXAM_CATEGORIES)
 export class ExamCategoryEntity {
@@ -18,6 +20,9 @@ export class ExamCategoryEntity {
 
   @Column({ nullable: true })
   logo_path: string;
+
+  @Column({ nullable: true, comment: enumToString(BooleanStatus), default: BooleanStatus.NO })
+  is_popular: number;
 
   @OneToMany(() => ExamEntity, (exam) => exam.category)
   exams: ExamEntity[];

@@ -1,5 +1,6 @@
 import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { IsNumeric } from "../../../config/validations/is-number-string.validator";
 
 export class CreateExamCategoryDto {
   @IsNotEmpty()
@@ -21,4 +22,9 @@ export class CreateExamCategoryDto {
   @IsString()
   @ApiPropertyOptional({ type: String })
   logo_path: string;
+
+  @IsOptional()
+  @IsNumeric()
+  @ApiPropertyOptional({ type: Number })
+  is_popular: number;
 }

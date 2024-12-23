@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Inject, Param, ParseIntPipe, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Inject, Param, ParseIntPipe, Post, Put, Query } from "@nestjs/common";
 import { ApiConsumes, ApiProduces } from "@nestjs/swagger";
 import { ExamCategoryService } from "./exam-category.service";
 import { PublicBaseController } from "../../guards/public.base.controller";
@@ -7,6 +7,7 @@ import { ExamCategoryEntity } from "../../database/entities/exam-category.entity
 import { CreateExamCategoryDto } from "./dto/create-exam-category.dto";
 import { DeleteResult } from "typeorm/query-builder/result/DeleteResult";
 import { ExamCategoryWithExamsDto } from "./dto/exam-with-category.dto";
+import { FilterExamCategoryDto } from "./dto/filter-exam-category.dto";
 
 @Controller("exam-category")
 export class ExamCategoryController extends PublicBaseController {
@@ -17,7 +18,7 @@ export class ExamCategoryController extends PublicBaseController {
   @ApiConsumes("application/json", `application/x-www-form-urlencoded`)
   @ApiProduces("application/json")
   async create(@Body() reqDto: CreateExamCategoryDto): Promise<ExamCategoryEntity> {
-    console.log("reqDto-------------------",reqDto)
+    console.log("reqDto-------------------", reqDto);
     return this.service.create(reqDto);
   }
 
@@ -29,8 +30,8 @@ export class ExamCategoryController extends PublicBaseController {
   }
 
   @Get()
-  async getAll(): Promise<ExamCategoryEntity[]> {
-    return this.service.getAll();
+  async getAll(@Query() reqDto: FilterExamCategoryDto): Promise<ExamCategoryEntity[]> {
+    return this.service.getAll(reqDto);
   }
 
   @Get("/exam-with-categories")

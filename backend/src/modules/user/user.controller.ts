@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Param, ParseIntPipe, Post, Put } from "@nestjs/common";
+import { Body, Controller, Get, Inject, Param, ParseIntPipe, Post, Put, Query } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UserEntity } from "../../database/entities/user.entity";
@@ -8,6 +8,7 @@ import { ChangeRoleDto } from "./dto/change-role.dto";
 import { PrivateBaseController } from "../../guards/private.base.controller";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { UpdateStatusDto } from "./dto/update-status.dto";
+import { FilterUserDto } from "./dto/filter-user.dto";
 
 @Controller("users")
 export class UserController extends PrivateBaseController {
@@ -32,8 +33,8 @@ export class UserController extends PrivateBaseController {
 
   @Get()
   @HasPermission([])
-  async getAll(): Promise<UserEntity[]> {
-    return this.userService.getAll();
+  async getAll(@Query() reqDto: FilterUserDto): Promise<UserEntity[]> {
+    return this.userService.getAll(reqDto);
   }
 
   @Get("profile")
@@ -55,15 +56,11 @@ export class UserController extends PrivateBaseController {
     return this.userService.changeRole(reqDto);
   }
 
-
   @Put(":id/status")
   @HasPermission([])
   @ApiConsumes("application/json", `application/x-www-form-urlencoded`)
   @ApiProduces("application/json")
-  async updateStatus(
-    @Param("id", ParseIntPipe) id: number,
-    @Body() reqDto: UpdateStatusDto
-  ): Promise<UserEntity> {
+  async updateStatus(@Param("id", ParseIntPipe) id: number, @Body() reqDto: UpdateStatusDto): Promise<UserEntity> {
     return this.userService.updateStatus(id, reqDto.status);
   }
 }

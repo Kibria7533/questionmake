@@ -6,6 +6,9 @@ export enum Gender {
 
 export enum Role {
   ADMIN = 1,
-  OPERATOR = 2,
-  REGULAR = 3,
+}
+
+export enum BooleanStatus {
+  YES = 1,
+  NO = 0,
 }

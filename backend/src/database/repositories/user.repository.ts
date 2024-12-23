@@ -1,7 +1,8 @@
-import { Repository } from "typeorm";
+import { Repository, SelectQueryBuilder } from "typeorm";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { UserEntity } from "../entities/user.entity";
+import { FilterUserDto } from "../../modules/user/dto/filter-user.dto";
 
 @Injectable()
 export class UserRepository extends Repository<UserEntity> {
@@ -9,8 +10,22 @@ export class UserRepository extends Repository<UserEntity> {
     super(repository.target, repository.manager, repository.queryRunner);
   }
 
-  async getAll(): Promise<UserEntity[]> {
-    return this.find({ select: ["id", "name", "mobile", "email", "dob","role","status"] });
+  async getAll(reqDto: FilterUserDto): Promise<UserEntity[]> {
+    const builder: SelectQueryBuilder<UserEntity> = this.createQueryBuilder("users").select([
+      "users.id",
+      "users.name",
+      "users.mobile",
+      "users.email",
+      "users.dob",
+      "users.role",
+      "users.status",
+    ]);
+
+    if (reqDto?.role) {
+      builder.andWhere("users.role = :role", { role: reqDto.role });
+    }
+
+    return builder.getMany();
   }
 
   async getAuthUser(sub: number): Promise<UserEntity> {
@@ -19,7 +34,7 @@ export class UserRepository extends Repository<UserEntity> {
 
   async getOneById(id: number): Promise<UserEntity> {
     return this.createQueryBuilder("users")
-      .select(["users.id", "users.name", "users.mobile", "users.email", "users.role","users.status"])
+      .select(["users.id", "users.name", "users.mobile", "users.email", "users.role", "users.status"])
       .where("users.id = :id", { id })
       .getOne();
   }

@@ -1,7 +1,9 @@
-import { Not, Repository } from "typeorm";
+import { Not, Repository, SelectQueryBuilder } from "typeorm";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ExamCategoryEntity } from "../entities/exam-category.entity";
+import { BooleanStatus } from "../../config/enum";
+import { FilterExamCategoryDto } from "../../modules/exam-category/dto/filter-exam-category.dto";
 
 @Injectable()
 export class ExamCategoryRepository extends Repository<ExamCategoryEntity> {
@@ -10,8 +12,21 @@ export class ExamCategoryRepository extends Repository<ExamCategoryEntity> {
   }
 
   // Get all exam categories
-  async getAll(): Promise<ExamCategoryEntity[]> {
-    return this.find();
+  async getAll(reqDto: FilterExamCategoryDto): Promise<ExamCategoryEntity[]> {
+    const builder: SelectQueryBuilder<ExamCategoryEntity> = this.createQueryBuilder("category");
+
+    if (reqDto?.is_popular == BooleanStatus.YES) {
+      builder.andWhere("category.is_popular = :is_popular", { is_popular: BooleanStatus.YES });
+    } else if (reqDto?.is_popular == BooleanStatus.NO) {
+      builder.andWhere("category.is_popular = :is_popular", { is_popular: BooleanStatus.NO });
+    }
+
+    return builder.getMany();
+  }
+
+  // Get all exam categories
+  async getPopularList(): Promise<ExamCategoryEntity[]> {
+    return this.find({ where: { is_popular: BooleanStatus.YES } });
   }
 
   // Get one exam category by ID
