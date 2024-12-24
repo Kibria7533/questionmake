@@ -12,7 +12,9 @@ const MainNavbar = () => {
   const { isAuthenticated } = useSelector((state) => state.user);
   const router = useRouter();
   const dispatch = useDispatch();
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [menuData, setMenuData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,7 +28,6 @@ const MainNavbar = () => {
   const setToken = async () => {
     const token = await localStorage.getItem("access_token");
     if (token) {
-      const token = await localStorage.getItem("access_token");
       dispatch(login({ token }));
     }
   };
@@ -90,23 +91,40 @@ const MainNavbar = () => {
       position: "absolute",
       top: "100%",
       left: "0",
-      backgroundColor: "white",
+      backgroundColor: "#fff",
       color: "#222",
       padding: "20px",
       borderRadius: "5px",
-      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-      display: isDropdownOpen ? "block" : "none",
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+      display: isDropdownOpen ? "flex" : "none",
+      zIndex: "999",
+      flexWrap: "wrap",
+      gap: "20px",
       minWidth: "400px",
+      transition: "opacity 0.3s ease, transform 0.3s ease",
+      opacity: isDropdownOpen ? "1" : "0",
+      transform: isDropdownOpen ? "translateY(0)" : "translateY(-10px)",
+    },
+    dropdownCategory: {
+      flex: "1 1 200px",
+    },
+    dropdownTitle: {
+      fontWeight: "bold",
+      marginBottom: "10px",
+      borderBottom: "1px solid #ddd",
+      paddingBottom: "5px",
     },
     dropdownItem: {
       padding: "5px 10px",
       textDecoration: "none",
       color: "#222",
       display: "block",
-      borderBottom: "1px solid #ddd",
+      borderRadius: "5px",
+      transition: "background-color 0.3s ease",
+      marginBottom: "5px",
     },
-    dropdownItemLast: {
-      borderBottom: "none",
+    dropdownItemHover: {
+      backgroundColor: "#f0f0f0",
     },
     actions: {
       display: "flex",
@@ -131,15 +149,31 @@ const MainNavbar = () => {
       padding: "5px 10px",
       borderRadius: "5px",
       cursor: "pointer",
+      position: "relative",
     },
-    authLinks: {
-      display: "flex",
-      alignItems: "center",
-      gap: "10px",
+    profileDropdown: {
+      position: "absolute",
+      top: "100%",
+      right: "0",
+      backgroundColor: "#fff",
+      color: "#222",
+      padding: "10px",
+      borderRadius: "5px",
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+      display: isProfileDropdownOpen ? "block" : "none",
+      zIndex: "999",
+      minWidth: "150px",
+      transition: "opacity 0.3s ease, transform 0.3s ease",
+      opacity: isProfileDropdownOpen ? "1" : "0",
+      transform: isProfileDropdownOpen ? "translateY(0)" : "translateY(-10px)",
     },
-    authLink: {
-      color: "white",
+    profileDropdownItem: {
+      padding: "5px 10px",
       textDecoration: "none",
+      color: "#222",
+      display: "block",
+      borderRadius: "5px",
+      transition: "background-color 0.3s ease",
     },
   };
 
@@ -147,7 +181,7 @@ const MainNavbar = () => {
     <nav style={styles.navbar}>
       {/* Logo */}
       <div style={styles.logo} onClick={() => router.push("/")}>
-      
+        লোগো
       </div>
 
       {/* Menu */}
@@ -168,16 +202,21 @@ const MainNavbar = () => {
               <div style={{ color: "red" }}>Error: {error}</div>
             ) : (
               menuData.map((menu, index) => (
-                <div key={index}>
-                  <strong>{menu.category}</strong>
+                <div style={styles.dropdownCategory} key={index}>
+                  <div style={styles.dropdownTitle}>{menu.category}</div>
                   {menu.items.map((item, idx) => (
                     <a
                       key={idx}
                       href={item.link}
                       style={{
                         ...styles.dropdownItem,
-                        ...(idx === menu.items.length - 1 && styles.dropdownItemLast),
                       }}
+                      onMouseOver={(e) =>
+                        (e.target.style.backgroundColor = styles.dropdownItemHover.backgroundColor)
+                      }
+                      onMouseOut={(e) =>
+                        (e.target.style.backgroundColor = "transparent")
+                      }
                     >
                       {item.name}
                     </a>
@@ -200,38 +239,43 @@ const MainNavbar = () => {
 
       {/* Actions */}
       <div style={styles.actions}>
-        {/* Search Button */}
-        <button style={styles.button}>
+        {/* <button style={styles.button}>
           <FaSearch />
-        </button>
+        </button> */}
 
         {/* Authentication Links */}
         {isAuthenticated ? (
-          <div className="dropdown">
-            <button style={styles.profileButton}>
-              <FaUserCircle /> প্রোফাইল
-            </button>
-            <div style={styles.dropdownMenu}>
-              <a href="/profile" style={styles.dropdownItem}>
+          <div
+            style={styles.profileButton}
+            onMouseEnter={() => setIsProfileDropdownOpen(true)}
+            onMouseLeave={() => setIsProfileDropdownOpen(false)}
+          >
+            <FaUserCircle /> প্রোফাইল
+            <div style={styles.profileDropdown}>
+              <a href="/profile" style={styles.profileDropdownItem}>
                 প্রোফাইল দেখুন
               </a>
               <button
                 onClick={handleLogout}
-                style={{ ...styles.dropdownItem, color: "red" }}
+                style={{
+                  ...styles.profileDropdownItem,
+                  color: "red",
+                  border: "none",
+                  background: "none",
+                  textAlign: "left",
+                  width: "100%",
+                }}
               >
                 লগ আউট
               </button>
             </div>
           </div>
         ) : (
-          <div style={styles.authLinks}>
-            <a href="/login" style={styles.authLink}>
+          <div>
+            <a href="/login" style={{ marginRight: "10px" , color: "white"}}>
               সাইন-ইন
             </a>
-            |
-            <a href="/signup" style={styles.authLink}>
-              সাইন আপ
-            </a>
+            <a href="/signup" style={{ marginRight: "10px" , color: "white"}}>সাইন আপ</a>
           </div>
         )}
       </div>

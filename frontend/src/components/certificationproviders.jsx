@@ -13,7 +13,7 @@ const CertificationProviders = () => {
     section: {
       padding: "50px 20px",
       fontFamily: "'Arial', sans-serif",
-      color: "#333", // Default text color for the section
+      color: "#333",
     },
     header: {
       textAlign: "center",
@@ -22,11 +22,11 @@ const CertificationProviders = () => {
     headerTitle: {
       fontSize: "1.8rem",
       fontWeight: "bold",
-      color: "white", // Darker color for visibility
+      color: "white",
     },
     headerSubtitle: {
       fontSize: "1rem",
-      color: "white", // Softer color for subtitle
+      color: "white",
     },
     logo: {
       height: "80px",
@@ -49,8 +49,9 @@ const CertificationProviders = () => {
     },
     grid: {
       display: "grid",
-      gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-      gap: "20px", // Adjusts spacing between cards
+      gridTemplateColumns: "repeat(4, 1fr)", // Show exactly 4 items per row
+      gap: "20px", // Consistent spacing between columns and rows
+      rowGap: "60px", // Add margin between rows
       marginTop: "20px",
     },
     examList: {
