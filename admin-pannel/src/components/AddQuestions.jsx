@@ -85,7 +85,7 @@ const AddQuestion = () => {
   const removeCreativeQuestion = (index) =>
     setCreativeQuestions(creativeQuestions.filter((_, i) => i !== index));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const questionData = {
       ...formData,
@@ -94,23 +94,44 @@ const AddQuestion = () => {
       creativeQuestions:
         questionType === "CREATIVE" ? creativeQuestions.map((q) => q.text) : undefined,
     };
-
-    console.log("Submitted Question:", questionData);
-    alert("Question added successfully!");
-
-    setFormData({
-      classes: "",
-      exams: "",
-      subjects: "",
-      chapters: "",
-      description: "",
-      questionText: "",
-      correctAnswer: "",
-      image: null,
-    });
-    setOptions([{ text: "", isCorrect: false }]);
-    setCreativeQuestions([{ text: "" }]);
+  
+    try {
+      const response = await fetch("http://localhost:4000/api/questions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(questionData),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Submitted Question:", data);
+        alert("Question added successfully!");
+  
+        // Reset form fields
+        setFormData({
+          classes: "",
+          exams: "",
+          subjects: "",
+          chapters: "",
+          description: "",
+          questionText: "",
+          correctAnswer: "",
+          image: null,
+        });
+        setOptions([{ text: "", isCorrect: false }]);
+        setCreativeQuestions([{ text: "" }]);
+      } else {
+        console.error("Failed to add question:", response.statusText);
+        alert("Failed to add question. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error submitting question:", error);
+      alert("An error occurred. Please try again.");
+    }
   };
+  
 
   return (
     <div

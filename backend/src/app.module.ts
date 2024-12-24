@@ -17,6 +17,8 @@ import { ChapterModule } from "./modules/chapter/chapter.module";
 import { PermissionManagerModule } from "./modules/permission/permission-manager.module";
 import { FileUploadModule } from "./modules/file-upload/file-upload.module";
 import { ContactModule } from "./modules/contact/contact.module";
+import { ElasticSearchModule } from "./modules/elastic/elasticsearch.module";
+import { QuestionController } from "./modules/elastic/question.controller";
 
 @Module({
   imports: [
@@ -37,8 +39,10 @@ import { ContactModule } from "./modules/contact/contact.module";
     PermissionManagerModule,
     FileUploadModule,
     ContactModule,
+    ElasticSearchModule
+    
   ],
-  controllers: [AppController],
+  controllers: [AppController,QuestionController],
   providers: [AppService],
 })
 export class AppModule {
