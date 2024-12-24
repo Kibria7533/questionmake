@@ -27,6 +27,7 @@ const MainNavbar = () => {
     const token = await localStorage.getItem("access_token");
     if (token) {
       const token = await localStorage.getItem("access_token");
+      dispatch(login({ token }));
     }
   };
 
@@ -55,7 +56,7 @@ const MainNavbar = () => {
   useEffect(() => {
     setToken();
     fetchMenuData();
-  }, [dispatch, router]);
+  }, [dispatch]);
 
   const styles = {
     navbar: {
@@ -91,11 +92,11 @@ const MainNavbar = () => {
       left: "0",
       backgroundColor: "white",
       color: "#222",
-      padding: "10px",
+      padding: "20px",
       borderRadius: "5px",
       boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
       display: isDropdownOpen ? "block" : "none",
-      minWidth: "200px",
+      minWidth: "400px",
     },
     dropdownItem: {
       padding: "5px 10px",

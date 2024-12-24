@@ -16,17 +16,16 @@ export const fetchExamCategories = createAsyncThunk(
   "examCategory/fetchExamCategories",
   async () => {
     const response = await axiosInstance.get("/exam-category");
-    return response.data; // Axios returns the data directly
+    return response.data;
   }
 );
 
 export const addExamCategory = createAsyncThunk(
   "examCategory/addExamCategory",
   async (formData) => {
-    console.log("formData", formData);
     const response = await axiosInstance.post("/exam-category", formData, {
       headers: {
-        "Content-Type": "application/json", // Ensure proper handling of FormData
+        "Content-Type": "application/json",
       },
     });
     return response.data;
@@ -36,10 +35,10 @@ export const addExamCategory = createAsyncThunk(
 export const updateExamCategory = createAsyncThunk(
   "examCategory/updateExamCategory",
   async (formData) => {
-    const {id } = formData;
+    const { id } = formData;
     const response = await axiosInstance.put(`/exam-category/${id}`, formData, {
       headers: {
-        "Content-Type": "application/json", // Ensure proper handling of FormData
+        "Content-Type": "application/json",
       },
     });
     return response.data;
@@ -84,7 +83,11 @@ const examCategorySlice = createSlice({
       })
       .addCase(addExamCategory.fulfilled, (state, action) => {
         state.loading = false;
-        state.categories.push(action.payload);
+        const newCategory = action.payload;
+        state.categories.push({
+          ...newCategory,
+          is_popular: newCategory.is_popular === 1 ? 1 : 0, // Ensure is_popular consistency
+        });
       })
       .addCase(addExamCategory.rejected, (state, action) => {
         state.loading = false;
@@ -96,11 +99,15 @@ const examCategorySlice = createSlice({
       })
       .addCase(updateExamCategory.fulfilled, (state, action) => {
         state.loading = false;
+        const updatedCategory = action.payload;
         const index = state.categories.findIndex(
-          (category) => category.id === action.payload.id
+          (category) => category.id === updatedCategory.id
         );
         if (index !== -1) {
-          state.categories[index] = action.payload;
+          state.categories[index] = {
+            ...updatedCategory,
+            is_popular: updatedCategory.is_popular === 1 ? 1 : 0, // Ensure is_popular consistency
+          };
         }
       })
       .addCase(updateExamCategory.rejected, (state, action) => {

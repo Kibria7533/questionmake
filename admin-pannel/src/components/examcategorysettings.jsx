@@ -20,6 +20,7 @@ const ExamCategorySettings = () => {
     description: "",
     feedback: "",
     logoPath: "",
+    is_popular: 0, // Initialize as 0 (BooleanStatus.NO)
   });
 
   const [editCategory, setEditCategory] = useState(null);
@@ -72,13 +73,20 @@ const ExamCategorySettings = () => {
       description: newCategory.description,
       feedback: newCategory.feedback,
       logo_path: logoPath,
+      is_popular: newCategory.is_popular, // Pass is_popular as number
     };
 
     dispatch(addExamCategory(categoryData))
       .unwrap()
       .then(() => {
         alert("Exam category added successfully!");
-        setNewCategory({ name: "", description: "", feedback: "", logoPath: "" });
+        setNewCategory({
+          name: "",
+          description: "",
+          feedback: "",
+          logoPath: "",
+          is_popular: 0,
+        });
       })
       .catch((error) => {
         console.error("Error adding category:", error);
@@ -104,6 +112,7 @@ const ExamCategorySettings = () => {
       description: editCategory.description,
       feedback: editCategory.feedback,
       logo_path: logoPath,
+      is_popular: editCategory.is_popular, // Pass is_popular as number
     };
 
     dispatch(updateExamCategory(categoryData))
@@ -167,6 +176,20 @@ const ExamCategorySettings = () => {
               setNewCategory({ ...newCategory, logoFile: e.target.files[0] })
             }
           />
+          <div className="form-check mb-2">
+            <input
+              type="checkbox"
+              className="form-check-input"
+              checked={newCategory.is_popular === 1}
+              onChange={(e) =>
+                setNewCategory({
+                  ...newCategory,
+                  is_popular: e.target.checked ? 1 : 0,
+                })
+              }
+            />
+            <label className="form-check-label">Is Popular</label>
+          </div>
           <button className="btn btn-success" onClick={handleAddExamCategory}>
             Add
           </button>
@@ -183,6 +206,7 @@ const ExamCategorySettings = () => {
               <th>Description</th>
               <th>Feedback</th>
               <th>Logo</th>
+              <th>Is Popular</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -201,6 +225,7 @@ const ExamCategorySettings = () => {
                     />
                   )}
                 </td>
+                <td>{category.is_popular === 1 ? "Yes" : "No"}</td>
                 <td>
                   <button
                     className="btn btn-warning me-2"
@@ -273,6 +298,19 @@ const ExamCategorySettings = () => {
                   type="file"
                   onChange={(e) =>
                     setEditCategory({ ...editCategory, logo: e.target.files[0] })
+                  }
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Check
+                  type="checkbox"
+                  label="Is Popular"
+                  checked={editCategory.is_popular === 1}
+                  onChange={(e) =>
+                    setEditCategory({
+                      ...editCategory,
+                      is_popular: e.target.checked ? 1 : 0,
+                    })
                   }
                 />
               </Form.Group>
