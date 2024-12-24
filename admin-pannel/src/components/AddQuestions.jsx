@@ -119,7 +119,7 @@ const AddQuestion = () => {
         alert("At least two options are required for multiple-choice questions.");
         return;
       }
-      const hasCorrectOption = questionData.options.some((option) => questionData.option.isCorrect);
+      const hasCorrectOption = questionData.options.some((option) => option.isCorrect);
       if (!hasCorrectOption) {
         alert("At least one option must be marked as correct.");
         return;
@@ -142,7 +142,7 @@ const AddQuestion = () => {
         alert("Description cannot be empty for creative questions.");
         return;
       }
-      if (!questionData.creativeQuestions || questionData.creativeQuestions.length === 0 || !questionData.creativeQuestions[0].text) {
+      if (!questionData.creativeQuestions || questionData.creativeQuestions.length === 0 || !questionData.creativeQuestions[0]) {
         alert("At least one creative question must be provided.");
         return;
       }

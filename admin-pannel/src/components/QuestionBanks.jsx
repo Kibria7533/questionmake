@@ -269,9 +269,13 @@ const removeQuestionFromState = (questionId) => {
     <div className="col-md-6 mb-3" key={index}>
       <div className="card">
         <div className="card-body">
-          <h5 className="card-title text-primary">
-            {question.questionText || "Untitled Question"}
-          </h5>
+        {
+          question.type !== "CREATIVE" && (
+            <h5 className="card-title text-primary">
+              {question.questionText || "Untitled Question"}
+            </h5>
+          )
+        }
           {question.type === "MULTIPLE CHOICE" && (
             <div>
               <strong>Options:</strong>
@@ -294,22 +298,7 @@ const removeQuestionFromState = (questionId) => {
           )}
           {question.type === "TRUE/FALSE" && (
             <div>
-              <strong>Options:</strong>
-              <div>
-                {question.options?.map((option, optIndex) => (
-                  <div
-                    key={optIndex}
-                    className={
-                      option.isCorrect
-                        ? "text-success fw-bold"
-                        : "text-secondary"
-                    }
-                  >
-                    {String.fromCharCode(97 + optIndex)}) {option.text}{" "}
-                    {option.isCorrect && "(Correct Answer)"}
-                  </div>
-                ))}
-              </div>
+              <h2>{question.correctAnswer}</h2>
             </div>
           )}
           {question.type === "CREATIVE" && (
