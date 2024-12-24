@@ -1,0 +1,13 @@
+.modal.fade {
+    display: none;
+  }
+  
+  .modal.fade.show {
+    display: block;
+    background: rgba(0, 0, 0, 0.5);
+  }
+  
+  .modal-dialog {
+    margin: 1.75rem auto;
+  }
+  

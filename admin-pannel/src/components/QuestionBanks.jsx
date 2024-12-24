@@ -3,9 +3,12 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import axios from "axios";
+import "./questionbank.css";
 
 const Questionbank = () => {
   const [token, setToken] = useState(null);
+const [showEditModal, setShowEditModal] = useState(false);
+const [editingQuestion, setEditingQuestion] = useState(null);
   const [filters, setFilters] = useState({
     examCategory: "",
     exam: "",
@@ -29,6 +32,57 @@ const Questionbank = () => {
   });
 
   const [questions, setQuestions] = useState([]);
+
+const handleEditQuestion = (questionId) => {
+  const questionToEdit = questions.find((q) => q.id === questionId);
+  if (questionToEdit) {
+    setEditingQuestion(questionToEdit);
+    setShowEditModal(true);
+  }
+};
+
+
+const handleUpdateQuestion = async () => {
+
+  try {
+    const response = await fetch(
+      `http://localhost:4000/api/questions/${editingQuestion.id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(editingQuestion),
+      }
+    );
+
+    if (response.ok) {
+     
+      const updatedQuestion = await response.json();
+
+      console.log("updatedQuestion",updatedQuestion)
+
+      // Update the local state with the updated question
+      setQuestions((prevQuestions) =>
+        prevQuestions.map((q) =>
+          q.id === editingQuestion.id ? editingQuestion : q
+        )
+      );
+
+      alert("Question updated successfully!");
+
+      // Close the modal
+      setShowEditModal(false);
+    } else {
+      const errorData = await response.json();
+      alert(`Failed to update question: ${errorData.message || response.status}`);
+    }
+  } catch (error) {
+    console.error("Error updating question:", error);
+    alert("An error occurred while updating the question. Please try again.");
+  }
+};
+
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -368,6 +422,146 @@ const removeQuestionFromState = (questionId) => {
 
 
 {/* Question display end */}
+
+{showEditModal && editingQuestion && (
+  <div className="modal fade show d-block" tabIndex="-1" role="dialog">
+    <div className="modal-dialog" role="document">
+      <div className="modal-content">
+        <div className="modal-header">
+          <h5 className="modal-title">Edit Question</h5>
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setShowEditModal(false)}
+          ></button>
+        </div>
+        <div className="modal-body">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleUpdateQuestion();
+            }}
+          >
+     {/* Show Question Text only for non-CREATIVE types */}
+            {editingQuestion.type !== "CREATIVE" && (
+              <div className="mb-3">
+                <label>Question Text</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={editingQuestion.questionText || ""}
+                  onChange={(e) =>
+                    setEditingQuestion({
+                      ...editingQuestion,
+                      questionText: e.target.value,
+                    })
+                  }
+                />
+              </div>
+            )}
+            {editingQuestion.type === "MULTIPLE CHOICE" && (
+              <div className="mb-3">
+                <label>Options</label>
+                {editingQuestion.options.map((option, index) => (
+                  <div key={index} className="d-flex mb-2">
+                    <input
+                      type="text"
+                      className="form-control me-2"
+                      value={option.text}
+                      onChange={(e) => {
+                        const updatedOptions = [...editingQuestion.options];
+                        updatedOptions[index].text = e.target.value;
+                        setEditingQuestion({
+                          ...editingQuestion,
+                          options: updatedOptions,
+                        });
+                      }}
+                    />
+                    <input
+                      type="checkbox"
+                      checked={option.isCorrect}
+                      onChange={(e) => {
+                        const updatedOptions = [...editingQuestion.options];
+                        updatedOptions[index].isCorrect = e.target.checked;
+                        setEditingQuestion({
+                          ...editingQuestion,
+                          options: updatedOptions,
+                        });
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+            {editingQuestion.type === "TRUE/FALSE" && (
+              <div className="mb-3">
+                <label>Correct Answer</label>
+                <select
+                  className="form-select"
+                  value={editingQuestion.correctAnswer || ""}
+                  onChange={(e) =>
+                    setEditingQuestion({
+                      ...editingQuestion,
+                      correctAnswer: e.target.value,
+                    })
+                  }
+                >
+                  <option value="True">True</option>
+                  <option value="False">False</option>
+                </select>
+              </div>
+            )}
+            {editingQuestion.type === "CREATIVE" && (
+              <div className="mb-3">
+                <label>Description</label>
+                <textarea
+                  className="form-control"
+                  value={editingQuestion.description || ""}
+                  onChange={(e) =>
+                    setEditingQuestion({
+                      ...editingQuestion,
+                      description: e.target.value,
+                    })
+                  }
+                />
+                <label>Creative Questions</label>
+                {editingQuestion.creativeQuestions?.map((cq, index) => (
+                  <input
+                    key={index}
+                    type="text"
+                    className="form-control my-2"
+                    value={cq}
+                    onChange={(e) => {
+                      const updatedCQ = [...editingQuestion.creativeQuestions];
+                      updatedCQ[index] = e.target.value;
+                      setEditingQuestion({
+                        ...editingQuestion,
+                        creativeQuestions: updatedCQ,
+                      });
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+            <button type="submit" className="btn btn-primary">
+              Save Changes
+            </button>
+          </form>
+        </div>
+        <div className="modal-footer">
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => setShowEditModal(false)}
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
