@@ -1,101 +1,115 @@
 "use client";
-import { useState } from "react";
-import Select from "react-select";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 const AddQuestion = () => {
-  const [questionType, setQuestionType] = useState("mcq");
-  const [options, setOptions] = useState([""]);
-  const [subQuestions, setSubQuestions] = useState([
-    { question: "", correctAnswer: "" },
+  const [questionType, setQuestionType] = useState("");
+  const [classOptions, setClassOptions] = useState([]);
+  const [examOptions, setExamOptions] = useState([]);
+  const [subjectOptions, setSubjectOptions] = useState([]);
+  const [chapterOptions, setChapterOptions] = useState([]);
+  const [questionTypeOptions, setQuestionTypeOptions] = useState([
+    { id: 2, name: "MULTIPLE CHOICE" },
+    { id: 3, name: "TRUE/FALSE" },
+    { id: 4, name: "CREATIVE" },
   ]);
   const [formData, setFormData] = useState({
-    classes: [],
-    subjects: [],
-    chapters: [],
+    classes: "",
+    exams: "",
+    subjects: "",
+    chapters: "",
+    description: "",
     questionText: "",
     correctAnswer: "",
-    description: "",
     image: null,
   });
 
-  const classOptions = [
-    { value: "Class 1", label: "Class 1" },
-    { value: "Class 2", label: "Class 2" },
-    { value: "Class 3", label: "Class 3" },
-    { value: "Class 4", label: "Class 4" },
-    { value: "Class 5", label: "Class 5" },
-  ];
+  const [options, setOptions] = useState([{ text: "", isCorrect: false }]);
+  const [creativeQuestions, setCreativeQuestions] = useState([{ text: "" }]);
 
-  const subjectOptions = [
-    { value: "Mathematics", label: "Mathematics" },
-    { value: "Science", label: "Science" },
-    { value: "History", label: "History" },
-    { value: "English", label: "English" },
-  ];
+  const fetchData = async () => {
+    try {
+      const headers = {
+        Authorization:
+          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTczNTAyNjkxNiwiZXhwIjoxNzM1NjMxNzE2fQ.CKevHW7RDJIrZYt_4DwexXBqQcxZ7S-Ok4svy0BJPdo",
+      };
 
-  const chapterOptions = [
-    { value: "Chapter 1", label: "Chapter 1" },
-    { value: "Chapter 2", label: "Chapter 2" },
-    { value: "Chapter 3", label: "Chapter 3" },
-    { value: "Chapter 4", label: "Chapter 4" },
-  ];
+      const [classRes, examRes, subjectRes, chapterRes] = await Promise.all([
+        axios.get("http://localhost:4000/api/classes", { headers }),
+        axios.get("http://localhost:4000/api/exam", { headers }),
+        axios.get("http://localhost:4000/api/subjects", { headers }),
+        axios.get("http://localhost:4000/api/chapters", { headers }),
+      ]);
 
-  const handleMultiSelectChange = (field, selectedOptions) => {
-    setFormData({
-      ...formData,
-      [field]: selectedOptions.map((opt) => opt.value),
-    });
+      setClassOptions(classRes.data.map((cls) => cls.name));
+      setExamOptions(examRes.data.map((exam) => exam.name));
+      setSubjectOptions(subjectRes.data.map((subject) => subject.name));
+      setChapterOptions(chapterRes.data.map((chapter) => chapter.name));
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+    }
   };
 
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleFileChange = (e) => {
     setFormData({ ...formData, image: e.target.files[0] });
   };
 
-  const handleOptionChange = (index, value) => {
+  const handleOptionChange = (index, field, value) => {
     const updatedOptions = [...options];
-    updatedOptions[index] = value;
+    updatedOptions[index][field] = value;
     setOptions(updatedOptions);
   };
 
-  const addOption = () => {
-    setOptions([...options, ""]);
+  const addOption = () => setOptions([...options, { text: "", isCorrect: false }]);
+
+  const removeOption = (index) => setOptions(options.filter((_, i) => i !== index));
+
+  const handleCreativeQuestionChange = (index, value) => {
+    const updatedCreativeQuestions = [...creativeQuestions];
+    updatedCreativeQuestions[index].text = value;
+    setCreativeQuestions(updatedCreativeQuestions);
   };
 
-  const removeOption = (index) => {
-    const updatedOptions = options.filter((_, i) => i !== index);
-    setOptions(updatedOptions);
-  };
+  const addCreativeQuestion = () =>
+    setCreativeQuestions([...creativeQuestions, { text: "" }]);
 
-  const handleSubQuestionChange = (index, field, value) => {
-    const updatedSubQuestions = [...subQuestions];
-    updatedSubQuestions[index][field] = value;
-    setSubQuestions(updatedSubQuestions);
-  };
-
-  const addSubQuestion = () => {
-    setSubQuestions([...subQuestions, { question: "", correctAnswer: "" }]);
-  };
-
-  const removeSubQuestion = (index) => {
-    const updatedSubQuestions = subQuestions.filter((_, i) => i !== index);
-    setSubQuestions(updatedSubQuestions);
-  };
+  const removeCreativeQuestion = (index) =>
+    setCreativeQuestions(creativeQuestions.filter((_, i) => i !== index));
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const questionData = {
       ...formData,
       type: questionType,
-      options: questionType === "mcq" ? options : undefined,
-      subQuestions: questionType === "creative" ? subQuestions : undefined,
+      options: questionType === "MULTIPLE CHOICE" ? options : undefined,
+      creativeQuestions:
+        questionType === "CREATIVE" ? creativeQuestions.map((q) => q.text) : undefined,
     };
 
     console.log("Submitted Question:", questionData);
     alert("Question added successfully!");
+
+    setFormData({
+      classes: "",
+      exams: "",
+      subjects: "",
+      chapters: "",
+      description: "",
+      questionText: "",
+      correctAnswer: "",
+      image: null,
+    });
+    setOptions([{ text: "", isCorrect: false }]);
+    setCreativeQuestions([{ text: "" }]);
   };
 
   return (
@@ -111,130 +125,126 @@ const AddQuestion = () => {
     >
       <h2 style={{ textAlign: "center", marginBottom: "20px" }}>Add Question</h2>
       <form onSubmit={handleSubmit}>
-        {/* Responsive Grid for Multi-Select Inputs */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-            gap: "20px",
-          }}
-        >
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "20px" }}>
           <div>
-            <label style={{ display: "block", fontWeight: "bold", marginBottom: "5px" }}>
-              Class:
-            </label>
-            <Select
-              options={classOptions}
-              isMulti
-              onChange={(selectedOptions) =>
-                handleMultiSelectChange("classes", selectedOptions)
-              }
-              placeholder="Select Classes"
-            />
+            <label>Class:</label>
+            <select
+              name="classes"
+              value={formData.classes}
+              onChange={handleInputChange}
+              style={{ width: "100%", padding: "10px", marginBottom: "20px" }}
+            >
+              <option value="">Select a class</option>
+              {classOptions.map((cls, index) => (
+                <option key={index} value={cls}>
+                  {cls}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>
-            <label style={{ display: "block", fontWeight: "bold", marginBottom: "5px" }}>
-              Subject:
-            </label>
-            <Select
-              options={subjectOptions}
-              isMulti
-              onChange={(selectedOptions) =>
-                handleMultiSelectChange("subjects", selectedOptions)
-              }
-              placeholder="Select Subjects"
-            />
+            <label>Exam:</label>
+            <select
+              name="exams"
+              value={formData.exams}
+              onChange={handleInputChange}
+              style={{ width: "100%", padding: "10px", marginBottom: "20px" }}
+            >
+              <option value="">Select an exam</option>
+              {examOptions.map((exam, index) => (
+                <option key={index} value={exam}>
+                  {exam}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>
-            <label style={{ display: "block", fontWeight: "bold", marginBottom: "5px" }}>
-              Chapter:
-            </label>
-            <Select
-              options={chapterOptions}
-              isMulti
-              onChange={(selectedOptions) =>
-                handleMultiSelectChange("chapters", selectedOptions)
-              }
-              placeholder="Select Chapters"
-            />
+            <label>Subject:</label>
+            <select
+              name="subjects"
+              value={formData.subjects}
+              onChange={handleInputChange}
+              style={{ width: "100%", padding: "10px", marginBottom: "20px" }}
+            >
+              <option value="">Select a subject</option>
+              {subjectOptions.map((subject, index) => (
+                <option key={index} value={subject}>
+                  {subject}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>
-            <label style={{ display: "block", fontWeight: "bold", marginBottom: "5px" }}>
-              Question Type:
-            </label>
+            <label>Chapter:</label>
+            <select
+              name="chapters"
+              value={formData.chapters}
+              onChange={handleInputChange}
+              style={{ width: "100%", padding: "10px", marginBottom: "20px" }}
+            >
+              <option value="">Select a chapter</option>
+              {chapterOptions.map((chapter, index) => (
+                <option key={index} value={chapter}>
+                  {chapter}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label>Question Type:</label>
             <select
               value={questionType}
               onChange={(e) => setQuestionType(e.target.value)}
-              style={{
-                padding: "10px",
-                borderRadius: "5px",
-                border: "1px solid #ddd",
-                width: "100%",
-              }}
+              style={{ width: "100%", padding: "10px", marginBottom: "20px" }}
             >
-              <option value="mcq">Multiple Choice</option>
-              <option value="truefalse">True/False</option>
-              <option value="shortanswer">Short Answer</option>
-              <option value="creative">Creative</option>
+              <option value="">Select a question type</option>
+              {questionTypeOptions.map((type) => (
+                <option key={type.id} value={type.name}>
+                  {type.name}
+                </option>
+              ))}
             </select>
           </div>
         </div>
 
-        {/* Inputs for Question Text */}
-        {questionType !== "creative" && (
-          <>
-            <label style={{ display: "block", marginBottom: "10px", fontWeight: "bold" }}>
-              Question Text:
-            </label>
+        {/* Conditional Inputs */}
+        {questionType === "MULTIPLE CHOICE" && (
+          <div>
+            <label>Question:</label>
             <textarea
               name="questionText"
               value={formData.questionText}
               onChange={handleInputChange}
               placeholder="Enter the question"
-              required
-              style={{
-                width: "100%",
-                padding: "10px",
-                marginBottom: "20px",
-                borderRadius: "5px",
-                border: "1px solid #ddd",
-              }}
+              style={{ width: "100%", padding: "10px", marginBottom: "20px" }}
             ></textarea>
-          </>
-        )}
 
-        {/* Options for MCQ */}
-        {questionType === "mcq" && (
-          <div>
-            <label style={{ display: "block", marginBottom: "10px", fontWeight: "bold" }}>
-              Options:
-            </label>
+            <label>Options:</label>
             {options.map((option, index) => (
-              <div
-                key={index}
-                style={{
-                  display: "flex",
-                  marginBottom: "10px",
-                  alignItems: "center",
-                }}
-              >
+              <div key={index} style={{ display: "flex", marginBottom: "10px", alignItems: "center" }}>
                 <input
                   type="text"
-                  value={option}
-                  onChange={(e) => handleOptionChange(index, e.target.value)}
+                  value={option.text}
+                  onChange={(e) =>
+                    handleOptionChange(index, "text", e.target.value)
+                  }
                   placeholder={`Option ${index + 1}`}
-                  required
-                  style={{
-                    flex: "1",
-                    padding: "10px",
-                    marginRight: "10px",
-                    borderRadius: "5px",
-                    border: "1px solid #ddd",
-                  }}
+                  style={{ flex: 1, marginRight: "10px", padding: "10px" }}
                 />
+                <label style={{ marginRight: "10px" }}>
+                  <input
+                    type="checkbox"
+                    checked={option.isCorrect}
+                    onChange={(e) =>
+                      handleOptionChange(index, "isCorrect", e.target.checked)
+                    }
+                  />{" "}
+                  Correct
+                </label>
                 <button
                   type="button"
                   onClick={() => removeOption(index)}
@@ -244,7 +254,6 @@ const AddQuestion = () => {
                     color: "white",
                     border: "none",
                     borderRadius: "5px",
-                    cursor: "pointer",
                   }}
                 >
                   Remove
@@ -255,15 +264,12 @@ const AddQuestion = () => {
               type="button"
               onClick={addOption}
               style={{
-                padding: "10px 20px",
+                padding: "10px",
                 backgroundColor: "#5bc0de",
                 color: "white",
-                fontWeight: "bold",
                 border: "none",
                 borderRadius: "5px",
-                cursor: "pointer",
-                display: "inline-block",
-                marginTop: "10px",
+                margin: "20px 0px 30px"
               }}
             >
               + Add Option
@@ -271,105 +277,75 @@ const AddQuestion = () => {
           </div>
         )}
 
-        {/* Correct Answer Input */}
-        <label style={{ display: "block", marginBottom: "10px", fontWeight: "bold" }}>
-          Correct Answer:
-        </label>
-        <input
-          type="text"
-          name="correctAnswer"
-          value={formData.correctAnswer}
-          onChange={handleInputChange}
-          placeholder="Enter the correct answer"
-          required
-          style={{
-            width: "100%",
-            padding: "10px",
-            marginBottom: "20px",
-            borderRadius: "5px",
-            border: "1px solid #ddd",
-          }}
-        />
-
-        {/* Creative Question Type */}
-        {questionType === "creative" && (
+        {questionType === "TRUE/FALSE" && (
           <div>
-            <label style={{ display: "block", fontWeight: "bold", marginBottom: "10px" }}>
-              Description:
-            </label>
+            <label>Question:</label>
+            <textarea
+              name="questionText"
+              value={formData.questionText}
+              onChange={handleInputChange}
+              placeholder="Enter the question"
+              style={{ width: "100%", padding: "10px", marginBottom: "20px" }}
+            ></textarea>
+
+            <label>Correct Answer:</label>
+            <div style={{ marginBottom: "20px" }}>
+              <label style={{ marginRight: "20px" }}>
+                <input
+                  type="radio"
+                  name="correctAnswer"
+                  value="True"
+                  checked={formData.correctAnswer === "True"}
+                  onChange={handleInputChange}
+                />{" "}
+                True
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="correctAnswer"
+                  value="False"
+                  checked={formData.correctAnswer === "False"}
+                  onChange={handleInputChange}
+                />{" "}
+                False
+              </label>
+            </div>
+          </div>
+        )}
+
+        {questionType === "CREATIVE" && (
+          <div>
+            <label>Description:</label>
             <textarea
               name="description"
               value={formData.description}
               onChange={handleInputChange}
               placeholder="Enter the description"
-              style={{
-                width: "100%",
-                padding: "10px",
-                marginBottom: "10px",
-                borderRadius: "5px",
-                border: "1px solid #ddd",
-              }}
+              style={{ width: "100%", padding: "10px", marginBottom: "20px" }}
             ></textarea>
 
-            <label style={{ display: "block", marginBottom: "10px", fontWeight: "bold" }}>
-              Attach Image (Optional):
-            </label>
-            <input
-              type="file"
-              name="image"
-              onChange={handleFileChange}
-              style={{
-                marginBottom: "20px",
-              }}
-            />
-
-            <h4>Sub-Questions:</h4>
-            {subQuestions.map((subQ, index) => (
-              <div
-                key={index}
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr auto",
-                  gap: "10px",
-                  marginBottom: "10px",
-                }}
-              >
+            <label>Questions:</label>
+            {creativeQuestions.map((question, index) => (
+              <div key={index} style={{ display: "flex", marginBottom: "10px", alignItems: "center" }}>
                 <input
                   type="text"
-                  placeholder={`Sub-Question ${index + 1}`}
-                  value={subQ.question}
+                  value={question.text}
                   onChange={(e) =>
-                    handleSubQuestionChange(index, "question", e.target.value)
+                    handleCreativeQuestionChange(index, e.target.value)
                   }
-                  style={{
-                    padding: "10px",
-                    borderRadius: "5px",
-                    border: "1px solid #ddd",
-                  }}
-                />
-                <input
-                  type="text"
-                  placeholder="Correct Answer"
-                  value={subQ.correctAnswer}
-                  onChange={(e) =>
-                    handleSubQuestionChange(index, "correctAnswer", e.target.value)
-                  }
-                  style={{
-                    padding: "10px",
-                    borderRadius: "5px",
-                    border: "1px solid #ddd",
-                  }}
+                  placeholder={`Question ${index + 1}`}
+                  style={{ flex: 1, marginRight: "10px", padding: "10px" }}
                 />
                 <button
                   type="button"
-                  onClick={() => removeSubQuestion(index)}
+                  onClick={() => removeCreativeQuestion(index)}
                   style={{
                     padding: "10px",
                     backgroundColor: "#d9534f",
                     color: "white",
                     border: "none",
                     borderRadius: "5px",
-                    cursor: "pointer",
                   }}
                 >
                   Remove
@@ -378,36 +354,29 @@ const AddQuestion = () => {
             ))}
             <button
               type="button"
-              onClick={addSubQuestion}
+              onClick={addCreativeQuestion}
               style={{
-                padding: "10px 20px",
+                padding: "10px",
                 backgroundColor: "#5bc0de",
                 color: "white",
-                fontWeight: "bold",
                 border: "none",
                 borderRadius: "5px",
-                cursor: "pointer",
               }}
             >
-              + Add Sub-Question
+              + Add Question
             </button>
+
+            <label style={{marginLeft:"30px"}}>Attach Image (Optional):</label>
+            <input
+              type="file"
+              name="image"
+              onChange={handleFileChange}
+              style={{ marginBottom: "20px" }}
+            />
           </div>
         )}
 
-        <button
-          type="submit"
-          style={{
-            width: "100%",
-            padding: "15px",
-            marginTop: "20px",
-            backgroundColor: "#5cb85c",
-            color: "white",
-            fontWeight: "bold",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
-          }}
-        >
+        <button type="submit" style={{ padding: "10px 20px", backgroundColor: "#5cb85c", color: "white", border: "none", borderRadius: "5px" }}>
           Add Question
         </button>
       </form>
