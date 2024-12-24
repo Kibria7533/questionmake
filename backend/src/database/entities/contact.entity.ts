@@ -12,6 +12,6 @@ export class ContactEntity {
   @Column()
   email: string;
 
-  @Column()
+  @Column({ type: "text" })
   body: string;
 }

@@ -21,9 +21,6 @@ export default function RootLayout({ children }) {
   };
 
 
-
-
-
   return (
     <Provider store={store}>
     <html lang="en">

@@ -1,7 +1,16 @@
 "use client";
+import { useState } from "react";
 
-// Contact Page
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+
 const Contact = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [status, setStatus] = useState(null);
+
   const styles = {
     page: {
       padding: "20px",
@@ -72,28 +81,71 @@ const Contact = () => {
     },
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus("loading");
+
+    try {
+      const response = await fetch(`${BASE_URL}/contact`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          subject: formData.name,
+          email: formData.email,
+          body: formData.message,
+        }),
+      });
+
+      if (response.ok) {
+        setStatus("success");
+        setFormData({ name: "", email: "", message: "" });
+      } else {
+        setStatus("error");
+      }
+    } catch (error) {
+      setStatus("error");
+      console.error("Error submitting form:", error);
+    }
+  };
+
   return (
     <div style={styles.page}>
       <div style={styles.overlay}>
         <h1 style={styles.title}>Contact Us</h1>
-        <form style={styles.form}>
+        <form style={styles.form} onSubmit={handleSubmit}>
           <input
             type="text"
+            name="name"
             placeholder="Your Name"
+            value={formData.name}
             style={styles.input}
+            onChange={handleInputChange}
             onFocus={(e) => (e.target.style.boxShadow = styles.inputFocus.boxShadow)}
             onBlur={(e) => (e.target.style.boxShadow = "none")}
           />
           <input
             type="email"
+            name="email"
             placeholder="Your Email"
+            value={formData.email}
             style={styles.input}
+            onChange={handleInputChange}
             onFocus={(e) => (e.target.style.boxShadow = styles.inputFocus.boxShadow)}
             onBlur={(e) => (e.target.style.boxShadow = "none")}
           />
           <textarea
+            name="message"
             placeholder="Your Message"
+            value={formData.message}
             style={styles.textarea}
+            onChange={handleInputChange}
             onFocus={(e) => (e.target.style.boxShadow = styles.inputFocus.boxShadow)}
             onBlur={(e) => (e.target.style.boxShadow = "none")}
           ></textarea>
@@ -106,6 +158,9 @@ const Contact = () => {
             Send Message
           </button>
         </form>
+        {status === "loading" && <p>Sending...</p>}
+        {status === "success" && <p>Message sent successfully!</p>}
+        {status === "error" && <p>Failed to send message. Please try again later.</p>}
       </div>
     </div>
   );
