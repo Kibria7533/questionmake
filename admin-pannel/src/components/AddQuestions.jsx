@@ -87,6 +87,19 @@ const AddQuestion = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
+    // Validation Rules
+    const requiredFields = ["classes", "exams", "subjects", "chapters"];
+    for (const field of requiredFields) {
+      if (!formData[field]) {
+        alert(`The field "${field}" cannot be empty.`);
+        return;
+      }
+    }
+
+
+  
+    // Prepare Question Data
     const questionData = {
       ...formData,
       type: questionType,
@@ -94,6 +107,46 @@ const AddQuestion = () => {
       creativeQuestions:
         questionType === "CREATIVE" ? creativeQuestions.map((q) => q.text) : undefined,
     };
+  
+    console.log("questionData", questionData);
+    if (!questionData.type) {
+      alert(`The field Question Type cannot be empty.`);
+      return;
+    }
+
+    if (questionData.type === "MULTIPLE CHOICE") {
+      if (!questionData.options || questionData.options.length < 2) {
+        alert("At least two options are required for multiple-choice questions.");
+        return;
+      }
+      const hasCorrectOption = questionData.options.some((option) => questionData.option.isCorrect);
+      if (!hasCorrectOption) {
+        alert("At least one option must be marked as correct.");
+        return;
+      }
+    }
+  
+    if (questionData.type === "TRUE/FALSE") {
+      if (!formData.questionText) {
+        alert("QuestionText cannot be empty.");
+        return;
+      }
+      if (formData.correctAnswer !== "True" && formData.correctAnswer !== "False") {
+        alert('For "TRUE/FALSE" questions, the correct answer must be either "True" or "False".');
+        return;
+      }
+    }
+  
+    if (questionData.type === "CREATIVE") {
+      if (!formData.description) {
+        alert("Description cannot be empty for creative questions.");
+        return;
+      }
+      if (!questionData.creativeQuestions || questionData.creativeQuestions.length === 0 || !questionData.creativeQuestions[0].text) {
+        alert("At least one creative question must be provided.");
+        return;
+      }
+    }
   
     try {
       const response = await fetch("http://localhost:4000/api/questions", {

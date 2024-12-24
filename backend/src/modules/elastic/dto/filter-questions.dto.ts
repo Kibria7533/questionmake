@@ -1,18 +1,30 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsBoolean, IsDateString, IsEmail, IsMobilePhone, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class FilterQuestionsDto {
-  @ApiPropertyOptional({ description: 'Filter by class name' })
+
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional({ type: String })
   class?: string;
 
-  @ApiPropertyOptional({ description: 'Filter by subject name' })
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional({ type: String })
   subject?: string;
 
-  @ApiPropertyOptional({ description: 'Filter by exam name' })
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional({ type: String })
   exam?: string;
 
-  @ApiPropertyOptional({ description: 'Filter by chapter name' })
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional({ type: String })
   chapter?: string;
-
-  @ApiPropertyOptional({ description: 'Search by any text across multiple fields' })
+  
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional({ type: String })
   text?: string;
 }
