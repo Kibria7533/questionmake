@@ -28,4 +28,21 @@ export class ElasticsearchService {
       },
     });
   }
+
+  async updateDocument(index: string, id: string, body: any) {
+    return this.esService.update({
+      index,
+      id,
+      body: {
+        doc: body, // Elasticsearch requires partial updates to be specified under "doc"
+      },
+    });
+  }
+
+  async deleteDocument(index: string, id: string) {
+    return this.esService.delete({
+      index,
+      id,
+    });
+  }
 }

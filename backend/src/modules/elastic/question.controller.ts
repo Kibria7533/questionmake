@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Query } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, Put, Param, Delete } from '@nestjs/common';
 import { ElasticsearchService } from './elasticsearch.service';
 import { FilterQuestionsDto } from './dto/filter-questions.dto';
 
@@ -17,10 +17,10 @@ export class QuestionController {
     );
     return response;
   }
-  
+
   @Get('filter')
   async filterQuestions(@Query() query: FilterQuestionsDto) {
-    const { class: className, subject, exam, chapter, text } = query;
+    const { class: className, subject, exam, chapter, type, text } = query;
     const index = 'questions';
     const must = [];
 
@@ -36,6 +36,9 @@ export class QuestionController {
     if (chapter) {
       must.push({ match: { chapters: chapter } });
     }
+    if (type) {
+      must.push({ match: { type: type } });
+    }
     if (text) {
       must.push({
         multi_match: {
@@ -47,15 +50,37 @@ export class QuestionController {
 
     const queryBody = must.length ? { bool: { must } } : { match_all: {} };
     const response = await this.elasticsearchService.search(index, queryBody);
-    return response.hits.hits.map((hit) => hit._source);
+      // Map `_id` into the response objects
+      return response.hits.hits.map((hit) => ({
+        id: hit._id, // Add the id field
+        ...(hit._source as any), // Cast _source as any to allow spreading
+      }));
   }
-  
+
   @Get()
   async searchQuestions(@Query('query') query: string) {
     const index = 'questions';
     const response = await this.elasticsearchService.search(index, {
       match: { questionText: query },
     });
-    return response.hits.hits.map((hit) => hit._source);
+      // Map `_id` into the response objects
+      return response.hits.hits.map((hit) => ({
+        id: hit._id, // Add the id field
+        ...(hit._source as any), // Cast _source as any to allow spreading
+      }));
+  }
+
+  @Put(':id')
+  async updateQuestion(@Param('id') id: string, @Body() body: any) {
+    const index = 'questions';
+    const response = await this.elasticsearchService.updateDocument(index, id, body);
+    return response;
+  }
+
+  @Delete(':id')
+  async deleteQuestion(@Param('id') id: string) {
+    const index = 'questions';
+    const response = await this.elasticsearchService.deleteDocument(index, id);
+    return response;
   }
 }

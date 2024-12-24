@@ -22,6 +22,11 @@ export class FilterQuestionsDto {
   @IsString()
   @ApiPropertyOptional({ type: String })
   chapter?: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional({ type: String })
+  type?: string;
   
   @IsOptional()
   @IsString()
